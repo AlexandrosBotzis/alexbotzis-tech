@@ -1,0 +1,252 @@
+---
+// "Alex Botzis" laser-etched under the homepage bio.
+//
+// The signature (src/data/signature-name.ts) is one continuous gestural stroke.
+// When it scrolls into view a laser travels that exact path:
+//   - a hot point with a soft red bloom rides the leading edge,
+//   - a short red-hot segment trails it, fading through a faint ember
+//     glow before cooling to ink,
+//   - at the end of the tail the laser switches off; its last burn mark
+//     cools into the red full stop.
+// The glow exists only while etching. At rest, without JS, and under reduced
+// motion the result is a flat ink line with the red full stop.
+import { signatureName as sig } from '@/data/signature-name';
+import { author } from '@/data/site';
+
+interface Props {
+  /** false: a small static mark (line + red full stop), no laser, no script. */
+  animated?: boolean;
+  /** Rendered width, e.g. "7rem". Defaults to the CSS size. */
+  width?: string;
+  /** Static mark only: full stop in ink, where red must stay free for "you are here" (mobile menu). */
+  inkStop?: boolean;
+}
+const { animated = true, width, inkStop = false } = Astro.props;
+
+const pad = 90;
+const { minX, maxX, minY, maxY } = sig.bounds;
+const box = { x: minX - pad, y: minY - pad, w: maxX - minX + pad * 2, h: maxY - minY + pad * 2 };
+const viewBox = [box.x, box.y, box.w, box.h].join(' ');
+
+// Where the tail ends (the red full stop), as a fraction of the drawing, so
+// slotted content can sit on the tail's line at any rendered size.
+const endX = `${(((sig.end.x - box.x) / box.w) * 100).toFixed(2)}%`;
+const endY = `${(((sig.end.y - box.y) / box.h) * 100).toFixed(2)}%`;
+---
+
+{!animated ? (
+  <svg class="sig-svg sig-mark" viewBox={viewBox} aria-hidden="true" style={width ? `width:${width}` : undefined}>
+    <path class="sig-groove" d={sig.d} />
+    <circle class:list={["sig-stop", { "sig-stop--ink": inkStop }]} cx={sig.end.x} cy={sig.end.y} r="95" />
+  </svg>
+) : (
+<>
+<figure class="signature" data-signature style={`--sig-end-x:${endX};--sig-end-y:${endY}`}>
+  <svg class="sig-svg" viewBox={viewBox} role="img" aria-label={`Signed, ${author.name}`} style={width ? `width:${width}` : undefined}>
+    <defs>
+      <radialGradient id="sig-bloom-fill">
+        <stop offset="0" style="stop-color: var(--sig-hot); stop-opacity: 0.9" />
+        <stop offset="0.35" style="stop-color: var(--color-accent); stop-opacity: 0.45" />
+        <stop offset="1" style="stop-color: var(--color-accent); stop-opacity: 0" />
+      </radialGradient>
+    </defs>
+
+    <path class="sig-groove" d={sig.d} />
+    <path class="sig-ember" d={sig.d} aria-hidden="true" />
+    <path class="sig-heat" d={sig.d} aria-hidden="true" />
+    <path class="sig-core" d={sig.d} aria-hidden="true" />
+    <g class="sig-tip" aria-hidden="true">
+      <circle class="sig-bloom" r="210" fill="url(#sig-bloom-fill)" />
+      <circle class="sig-point" r="30" />
+    </g>
+    <circle class="sig-stop" cx={sig.end.x} cy={sig.end.y} r="46" />
+  </svg>
+  {Astro.slots.has('default') && (
+    <div class="sig-after"><slot /></div>
+  )}
+</figure>
+
+<script is:inline>
+  // Arm before first paint so the finished line never flashes; etch when seen.
+  (function () {
+    var fig = document.currentScript && document.currentScript.previousElementSibling;
+    if (!fig || !fig.matches('[data-signature]')) return;
+    if (!('IntersectionObserver' in window) || !('requestAnimationFrame' in window)) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    fig.classList.add('is-armed');
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        io.disconnect();
+        // Let the hero's own entrance land first when the mark is visible on load.
+        setTimeout(function () {
+          fig.classList.add('is-ready');
+          fig.dispatchEvent(new CustomEvent('signature:etch'));
+        }, 450);
+      });
+    }, { threshold: 0.6 });
+    io.observe(fig);
+  })();
+</script>
+</>
+)}
+
+<script>
+  const DURATION = 2600;       // ms of etching, start to switch-off
+  const COOL = 520;            // ms for the last heat to fade into the full stop
+  const EMBER_PX = 80;         // faint cooling glow behind the red-hot trail
+  const HEAT_PX = 26;          // red-hot trail length on screen
+  const CORE_PX = 5;           // white-hot segment at the tip
+
+  // Gesture pacing: a quick start, an even run, a decisive finish.
+  const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2) * 0.35 + t * 0.65;
+
+  function etch(fig: HTMLElement) {
+    const svg = fig.querySelector<SVGSVGElement>('.sig-svg')!;
+    const groove = fig.querySelector<SVGPathElement>('.sig-groove')!;
+    const ember = fig.querySelector<SVGPathElement>('.sig-ember')!;
+    const heat = fig.querySelector<SVGPathElement>('.sig-heat')!;
+    const core = fig.querySelector<SVGPathElement>('.sig-core')!;
+    const tip = fig.querySelector<SVGGElement>('.sig-tip')!;
+    const bloom = fig.querySelector<SVGCircleElement>('.sig-bloom')!;
+
+    const total = groove.getTotalLength();
+    const unitsPerPx = svg.viewBox.baseVal.width / svg.getBoundingClientRect().width;
+    const emberLen = EMBER_PX * unitsPerPx;
+    const heatLen = HEAT_PX * unitsPerPx;
+    const coreLen = CORE_PX * unitsPerPx;
+
+    const dash = (el: SVGPathElement, len: number, at: number) => {
+      el.style.strokeDasharray = `${len} ${total + len}`;
+      el.style.strokeDashoffset = `${len - at}`;
+    };
+
+    groove.style.strokeDasharray = `${total} ${total}`;
+    fig.classList.add('is-etching');
+
+    let start = 0;
+    const frame = (now: number) => {
+      if (!start) start = now;
+      const elapsed = now - start;
+      const t = Math.min(1, elapsed / DURATION);
+      const at = ease(t) * total;
+
+      groove.style.strokeDashoffset = `${total - at}`;
+      if (t < 1) {
+        dash(ember, emberLen, at);
+        dash(heat, heatLen, at);
+        dash(core, coreLen, at);
+        const p = groove.getPointAtLength(at);
+        tip.setAttribute('transform', `translate(${p.x} ${p.y})`);
+        // A laser never burns perfectly steady: a faint shimmer in the bloom.
+        bloom.setAttribute('r', String(190 + Math.random() * 45));
+        requestAnimationFrame(frame);
+        return;
+      }
+
+      // Switch-off: the trail cools toward the end point, the spot becomes the full stop.
+      const c = Math.min(1, (elapsed - DURATION) / COOL);
+      dash(ember, emberLen * (1 - c), total);
+      dash(heat, heatLen * (1 - c), total);
+      dash(core, coreLen * (1 - c) * (1 - c), total);
+      fig.classList.add('is-off');
+      if (c < 1) { requestAnimationFrame(frame); return; }
+
+      fig.classList.remove('is-armed', 'is-ready', 'is-etching');
+      fig.classList.add('is-etched');
+      groove.style.strokeDasharray = '';
+      groove.style.strokeDashoffset = '';
+    };
+    requestAnimationFrame(frame);
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-signature]').forEach((fig) => {
+    if (fig.classList.contains('is-ready')) etch(fig);
+    else fig.addEventListener('signature:etch', () => etch(fig), { once: true });
+  });
+</script>
+
+<style>
+  .signature {
+    /* The laser's hottest color: orange-white on paper, white-hot at night. */
+    --sig-hot: #FF7A45;
+    margin: 0.75rem 0 0.25rem;
+    color: var(--color-text);
+  }
+  :global([data-theme="dark"]) .signature { --sig-hot: #FFE4D2; }
+
+  .signature { position: relative; width: fit-content; }
+
+  /* Slotted content rides the tail's line, just past the full stop. */
+  .sig-after {
+    position: absolute;
+    left: calc(var(--sig-end-x) + 0.9rem);
+    top: var(--sig-end-y);
+    transform: translateY(-50%);
+    white-space: nowrap;
+  }
+  /* Hidden (and out of the tab order) until the laser switches off. */
+  .is-armed .sig-after { opacity: 0; visibility: hidden; transform: translate(-6px, -50%); }
+  .is-off .sig-after {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(-50%);
+    transition: opacity 0.5s ease-out 0.3s, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.3s, visibility 0s 0.3s;
+  }
+
+  .sig-svg {
+    display: block;
+    width: 18rem;
+    height: auto;
+    overflow: visible;
+  }
+
+  /* Widths are in path units (~17 units per px at 18rem), the same space the
+     dash maths uses. Don't use vector-effect: non-scaling-stroke here: it moves
+     dash lengths into screen space and the etch reveal stops matching the tip. */
+  .sig-groove,
+  .sig-ember,
+  .sig-heat,
+  .sig-core {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .sig-groove { stroke: currentColor; stroke-width: 27; }
+  .sig-ember  { stroke: var(--color-accent); stroke-width: 34; opacity: 0.35; display: none; }
+  .sig-heat   { stroke: var(--color-accent); stroke-width: 38; display: none; }
+  .sig-core   { stroke: var(--sig-hot); stroke-width: 32; display: none; }
+  .sig-tip    { display: none; }
+  .sig-point  { fill: var(--sig-hot); }
+  .sig-stop   { fill: var(--color-accent); transform-box: fill-box; transform-origin: center; }
+
+  /* ── Armed: blank surface, nothing etched yet ── */
+  .is-armed .sig-groove { opacity: 0; }
+  .is-armed .sig-stop { opacity: 0; transform: scale(0.4); }
+
+  /* ── Etching ── */
+  .is-etching .sig-groove { opacity: 1; }
+  .is-etching .sig-ember,
+  .is-etching .sig-heat,
+  .is-etching .sig-core { display: inline; }
+  .is-etching .sig-tip { display: inline; transition: opacity 0.4s ease-out; }
+
+  /* ── Switch-off: tip fades, its burn mark cools into the full stop ── */
+  .is-off .sig-tip { opacity: 0; }
+  .is-off .sig-stop {
+    opacity: 1;
+    transform: none;
+    transition: opacity 0.45s ease-out, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Static mark: thicker line in path units so it holds up at small sizes. */
+  .sig-mark { width: 7rem; }
+  /* ~1px at 7rem: the compressed lowercase clogs at heavier weights at this size. */
+  .sig-mark .sig-groove { stroke-width: 44; }
+  .sig-stop--ink { fill: currentColor; }
+
+  @media (max-width: 640px) {
+    .sig-svg:not(.sig-mark) { width: 15rem; }
+  }
+</style>

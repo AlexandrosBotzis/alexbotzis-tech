@@ -1,0 +1,151 @@
+---
+import Base from '@/layouts/Base.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import { getCollection } from 'astro:content';
+import { postSlug, formatDate, keepHyphens } from '@/data/site';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+// Below three posts a count reads as "just started"; show recency instead.
+const showCount = posts.length >= 3;
+const latest = posts[0]?.data.pubDate;
+const latestLabel = latest?.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+---
+
+<Base title="Writing" description="Writing on AI systems, security trade-offs, architecture decisions, and the path from IC to Engineering Manager.">
+
+  <div class="animate-fade-up">
+    <PageHeader title="Writing">
+      <div class="intro">
+        <p class="manifesto">Engineering, architecture, leadership.<br/>No tutorials.</p>
+      </div>
+      {showCount ? (
+        <span class="post-count">
+          <span class="count-num">{String(posts.length).padStart(2, '0')}</span>
+          <span class="count-label">entries</span>
+        </span>
+      ) : latest && (
+        <span class="post-count">
+          <span class="count-num count-num--date">{latestLabel}</span>
+          <span class="count-label">latest entry</span>
+        </span>
+      )}
+    </PageHeader>
+  </div>
+
+  <div class="max-w-5xl mx-auto px-6 animate-fade-up delay-2" style="padding-bottom: 6rem;">
+    <div class="post-list">
+      {posts.map(post => (
+        <a href={`/blog/${postSlug(post.id)}`} class="post-row bleed-row">
+          <div class="post-body">
+            <h2 class="post-title">{keepHyphens(post.data.title)}</h2>
+            <p class="post-desc">{post.data.description}</p>
+            <span class="post-read" aria-hidden="true">Read →</span>
+          </div>
+          <div class="post-meta">
+            <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate)}</time>
+            {post.data.tags.length > 0 && (
+              <span class="post-tags">{post.data.tags.join(' · ')}</span>
+            )}
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+
+</Base>
+
+<style>
+  .intro { display: flex; flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+
+  .manifesto {
+    font-size: var(--text-lg);
+    font-weight: 400;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+
+  .post-count { display: flex; align-items: baseline; gap: 0.5rem; flex-wrap: wrap; }
+  .count-num {
+    font-family: var(--font-mono);
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 400;
+    color: var(--color-accent);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .count-num--date {
+    font-size: clamp(1.75rem, 3.5vw, 2.5rem);   /* page-label scale */
+    text-transform: uppercase;
+  }
+  .count-label {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+  }
+
+  .post-list { border-bottom: 1px solid var(--color-line); }
+
+  .post-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.5rem 2rem;
+    align-items: start;
+    padding-block: 2rem;
+    text-decoration: none;
+  }
+  /* The masthead's 2px rule already closes the top; skip the doubled hairline. */
+  .post-row:first-child { background-image: none; }
+
+  .post-body { min-width: 0; }
+  .post-title {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--color-text);
+    line-height: 1.2;
+    margin: 0 0 0.5rem;
+    transition: color 0.12s ease;
+  }
+  .post-row:hover .post-title { color: var(--color-accent); }
+  .post-desc { font-size: var(--text-sm); color: var(--color-text-muted); line-height: 1.65; margin: 0; max-width: 62ch; }
+  /* Whole-row link: the mono cue says so at rest (red stays for the masthead date and nav). */
+  .post-read {
+    display: inline-block;
+    margin-top: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text);
+  }
+  .post-row:hover .post-read { color: var(--color-accent); }
+
+  .post-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+    padding-top: 0.35em;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+    white-space: nowrap;
+  }
+
+  @media (max-width: 640px) {
+    .manifesto { font-size: var(--text-base); }
+    .count-num { font-size: 2rem; }
+    .count-num--date { font-size: 1.5rem; }
+    .post-row { grid-template-columns: 1fr; padding-block: 1.25rem; }
+    /* Keep date and tags on phones, inline under the title block. */
+    .post-meta { flex-direction: row; align-items: baseline; gap: 1rem; padding-top: 0; }
+  }
+</style>

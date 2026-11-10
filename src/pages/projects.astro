@@ -1,0 +1,132 @@
+---
+import Base from '@/layouts/Base.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import { getCollection } from 'astro:content';
+import { projects, postSlug } from '@/data/site';
+
+const posts = await getCollection('blog', ({ data }) => !data.draft);
+const postTitle = (slug?: string) => posts.find(p => postSlug(p.id) === slug)?.data.title;
+
+// Same rule as the Writing masthead: below three, a count reads as thin.
+const showCount = projects.length >= 3;
+---
+
+<Base title="Projects" description="Security-sensitive AI systems: permission-aware retrieval, multi-tenant access control, and audit logging.">
+
+  <div class="animate-fade-up">
+    <PageHeader title="Projects">
+      <p class="manifesto">Security-sensitive AI systems, with the write-ups behind them.</p>
+      {showCount && (
+        <span class="project-count">
+          <span class="count-num">{String(projects.length).padStart(2, '0')}</span>
+          <span class="count-label">projects</span>
+        </span>
+      )}
+    </PageHeader>
+  </div>
+
+  <div class="max-w-5xl mx-auto px-6 animate-fade-up delay-2" style="padding-bottom: 6rem;">
+    {projects.map(p => {
+      const related = postTitle(p.post);
+      return (
+        <section class="feature-project" id={p.id} aria-labelledby={`${p.id}-name`}>
+          <div class="feature-body">
+            <h2 class="feature-name" id={`${p.id}-name`}>{p.name}</h2>
+            <p class="feature-desc">{p.description}</p>
+            {related && (
+              <a href={`/blog/${p.post}`} class="feature-read">Read the write-up: {related} →</a>
+            )}
+          </div>
+          <p class="feature-stack">{p.stack}</p>
+        </section>
+      );
+    })}
+  </div>
+
+</Base>
+
+<style>
+  .manifesto {
+    font-size: var(--text-lg);
+    font-weight: 400;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+
+  .project-count { display: flex; align-items: baseline; gap: 0.5rem; }
+  .count-num {
+    font-family: var(--font-mono);
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 400;
+    color: var(--color-accent);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .count-label {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+  }
+
+  .feature-project {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1rem 3rem;
+    padding: 2.5rem 0;
+    border-bottom: 2px solid var(--color-rule);
+    scroll-margin-top: 5rem;
+  }
+
+  .feature-name {
+    font-size: clamp(1.5rem, 1.1rem + 2vw, 2.25rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    color: var(--color-text);
+    margin: 0 0 0.875rem;
+  }
+
+  .feature-desc {
+    font-size: var(--text-base);
+    color: var(--color-text-muted);
+    line-height: 1.65;
+    margin: 0 0 1.25rem;
+    max-width: 58ch;
+  }
+
+  .feature-read {
+    display: inline-block;
+    padding-block: 0.25rem;
+    font-size: var(--text-base);
+    font-weight: 500;
+    color: var(--color-text);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.25em;
+    text-decoration-color: var(--color-text-faint);
+    transition: color 0.12s ease, text-decoration-color 0.12s ease;
+  }
+  .feature-read:hover { color: var(--color-accent); text-decoration-color: var(--color-accent); }
+
+  .feature-stack {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.04em;
+    color: var(--color-text-faint);
+    margin: 0.5rem 0 0;
+    max-width: 14rem;
+    text-align: right;
+    line-height: 1.8;
+  }
+
+  @media (max-width: 640px) {
+    .manifesto { font-size: var(--text-base); }
+    .count-num { font-size: 2rem; }
+    .feature-project { grid-template-columns: 1fr; padding: 1.75rem 0; }
+    .feature-stack { text-align: left; max-width: none; margin: 0; }
+  }
+</style>

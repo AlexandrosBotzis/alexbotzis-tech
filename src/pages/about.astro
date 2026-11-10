@@ -1,0 +1,212 @@
+---
+import Base from '@/layouts/Base.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import { getCollection } from 'astro:content';
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
+import { postSlug } from '@/data/site';
+
+const stack = [
+  { label: 'Backend', items: 'Go, Laravel, Node.js, Python, FastAPI, PHP' },
+  { label: 'Frontend', items: 'Vue 3, Nuxt, React, TypeScript, JavaScript (ES6+)' },
+  { label: 'Styling', items: 'Tailwind, SCSS/SASS, HTML5' },
+  { label: 'Testing', items: 'Cypress, Mocha, TDD, Selenium' },
+  { label: 'AI / RAG', items: 'RAG pipelines, LLM integration, vector indexing, permission-aware retrieval, Claude API' },
+  { label: 'Infra', items: 'Docker, Kubernetes, GitLab CI/CD, OpenTelemetry, Vite, Webpack' },
+  { label: 'Other', items: 'Supabase, Firebase, Keycloak, WordPress, Lokalise, Optimizely' },
+];
+
+const latestPost = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())[0];
+
+// CV section renders only once the PDF exists in public/, so the link can't 404.
+const cvPath = '/alex-botzis-cv.pdf';
+const hasCv = existsSync(join(process.cwd(), 'public', cvPath));
+---
+
+<Base title="About" description="Senior Full-Stack Engineer based in Greece. Information-security background, applied to AI systems. Working toward an Engineering Manager role.">
+
+  <div class="animate-fade-up">
+    <PageHeader title="About">
+      <p class="headline">I build software,<br/>and the teams<br/>that build it.</p>
+      <span class="exp-count">
+        <span class="count-label">Since</span>
+        <span class="count-num">2017</span>
+      </span>
+    </PageHeader>
+  </div>
+
+  <div class="max-w-5xl mx-auto px-6 animate-fade-up delay-2" style="padding-bottom: 4rem;">
+
+    <section class="content-row" aria-labelledby="row-background">
+      <h2 class="row-label" id="row-background">Background</h2>
+      <div class="row-body">
+        <p>I'm Alex Botzis, a Senior Full-Stack Engineer based in Greece. My academic background is in information security (MS, University of East London), and I bring that lens to AI systems: looking for the failure modes that pass every test and stay invisible.</p>
+        <p>Shipping production software since 2017, currently building B2C and B2B e-commerce at scale, 100% remote, within a microfrontend architecture. My current focus is AI and automation: systems and tooling that make teams faster, reduce friction, and improve developer experience.</p>
+        <p>I've also led internationalisation across multiple teams and markets, built shared component libraries to reduce technical debt, mentored engineers, and run technical interviews.</p>
+      </div>
+    </section>
+
+    <section class="content-row" aria-labelledby="row-writing">
+      <h2 class="row-label" id="row-writing">Writing</h2>
+      <div class="row-body">
+        <p>I write about the decisions that shaped the things I've built: architecture trade-offs, what broke, what held, and what I'd do differently. Increasingly, that includes the shift from writing code to leading the people who do.</p>
+        <div class="row-links">
+          {latestPost && (
+            <a href={`/blog/${postSlug(latestPost.id)}`} class="contact-link">Latest: {latestPost.data.title} →</a>
+          )}
+          <a href="/blog" class="mono-link">All writing →</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-row" aria-labelledby="row-stack">
+      <h2 class="row-label" id="row-stack">Stack</h2>
+      <div class="row-body">
+        <dl class="stack-grid">
+          {stack.map(s => (
+            <div class="stack-item">
+              <dt class="stack-label">{s.label}</dt>
+              <dd class="stack-items">{s.items}</dd>
+            </div>
+          ))}
+        </dl>
+        <p class="stack-note">I care more about architecture and trade-offs than specific frameworks.</p>
+      </div>
+    </section>
+
+    {hasCv && (
+      <section class="content-row" aria-labelledby="row-cv">
+        <h2 class="row-label" id="row-cv">CV</h2>
+        <div class="row-body">
+          <p>The full work history, roles, and education live in the CV.</p>
+          <a href={cvPath} download class="contact-link cv-link">Download CV (PDF) ↓</a>
+        </div>
+      </section>
+    )}
+
+
+  </div>
+
+</Base>
+
+<style>
+  .headline {
+    font-size: clamp(1.4rem, 2.8vw, 2rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    color: var(--color-text);
+    margin: 0;
+    text-wrap: balance; /* safety net if a line still has to wrap at mid widths */
+  }
+
+  .exp-count { display: flex; align-items: baseline; gap: 0.5rem; }
+  .count-num {
+    font-family: var(--font-mono);
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 400;
+    color: var(--color-accent);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .count-label {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+  }
+
+  .content-row {
+    display: grid;
+    grid-template-columns: 12rem 1fr;
+    gap: 0 3rem;
+    padding: 2.5rem 0;
+    border-top: 1px solid var(--color-line);
+    align-items: start;
+  }
+  /* The masthead's 2px rule already closes the top; skip the doubled hairline. */
+  .content-row:first-child { border-top: none; }
+  /* The footer's 2px press rule closes the page; no trailing hairline above it. */
+
+  .row-label {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+    padding-top: 0.3em;
+    margin: 0;
+  }
+
+  .row-body p {
+    font-size: var(--text-base);
+    color: var(--color-text-muted);
+    line-height: 1.75;
+    margin: 0 0 1rem;
+    max-width: 60ch;
+  }
+  .row-body p:last-child { margin-bottom: 0; }
+
+  .row-links {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+    margin-top: 1rem;
+  }
+
+  .cv-link { display: inline-block; margin-top: 1rem; }
+
+  /* ── Stack ── */
+  /* Spec-sheet rows: faint mono label | list in ink (the Ink-Grade Rule:
+     content in ink, metadata faint). Hairlines between rows, none at the top. */
+  .stack-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    margin: 0 0 1.25rem;
+  }
+  .stack-item {
+    display: grid;
+    grid-template-columns: 7.5rem 1fr;
+    gap: 0.25rem 1.5rem;
+    align-items: baseline;
+    padding: 0.75rem 0;
+    border-top: 1px solid var(--color-line);
+  }
+  .stack-item:first-child { border-top: none; padding-top: 0.25rem; }
+  .stack-label {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+  }
+  .stack-items { font-size: var(--text-sm); color: var(--color-text); line-height: 1.55; margin: 0; }
+  .row-body .stack-note { font-size: var(--text-sm); color: var(--color-text-faint); }
+
+  .contact-link {
+    display: inline-block;
+    padding-block: 0.25rem;
+    font-size: var(--text-base);
+    font-weight: 500;
+    color: var(--color-text);
+    letter-spacing: -0.01em;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.25em;
+    text-decoration-color: var(--color-text-faint);
+    transition: color 0.12s ease, text-decoration-color 0.12s ease;
+  }
+  .contact-link:hover { color: var(--color-accent); text-decoration-color: var(--color-accent); }
+
+  @media (max-width: 640px) {
+    .headline { font-size: 1.4rem; }
+    .content-row { grid-template-columns: 1fr; gap: 0.5rem; padding: 1.5rem 0; }
+    .row-body p { font-size: var(--text-sm); }
+    /* Phones: label above its list, still hairline-separated rows. */
+    .stack-item { grid-template-columns: 1fr; gap: 0.2rem; }
+  }
+</style>

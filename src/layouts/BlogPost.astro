@@ -1,0 +1,184 @@
+---
+import Base from './Base.astro';
+import { author, projects, formatDate, keepHyphens } from '@/data/site';
+
+interface Props {
+  title: string;
+  description: string;
+  pubDate: Date;
+  updatedDate?: Date;
+  tags?: string[];
+  slug: string;
+  readingMinutes: number;
+  next?: { title: string; href: string };
+}
+
+const { title, description, pubDate, updatedDate, tags = [], slug, readingMinutes, next } = Astro.props;
+
+const relatedProject = projects.find(p => p.post === slug);
+---
+
+<Base
+  title={title}
+  description={description}
+  article={{ publishedTime: pubDate, modifiedTime: updatedDate, tags }}
+>
+  <div class="mx-auto px-6 post-wrap">
+
+    <div class="animate-fade-in post-back">
+      <a href="/blog" class="mono-link">← Writing</a>
+    </div>
+
+    <header class="post-header animate-fade-up">
+      <h1 class="post-title">{keepHyphens(title)}</h1>
+      <p class="post-desc">{description}</p>
+
+      <div class="post-meta">
+        <time datetime={pubDate.toISOString()}>{formatDate(pubDate, 'long')}</time>
+        {updatedDate && <span>Updated {formatDate(updatedDate, 'long')}</span>}
+        <span>{readingMinutes} min read</span>
+        {tags.map(tag => <span>{tag}</span>)}
+      </div>
+    </header>
+
+    <article class="animate-fade-up delay-2 prose max-w-none">
+      <slot />
+    </article>
+
+    <aside class="end-matter" aria-label="About the author and what to read next">
+      <div class="end-row">
+        <h2 class="end-label">Written by</h2>
+        <p class="end-bio"><a href="/about" class="end-name">{author.name}</a>. {author.bio}</p>
+      </div>
+
+      {(next || relatedProject) && (
+        <div class="end-row">
+          <h2 class="end-label">{next ? 'Next' : 'Related'}</h2>
+          <div class="end-links end-links--stack">
+            {next && <a href={next.href} class="end-link">{next.title} →</a>}
+            {relatedProject && (
+              <a href={`/projects#${relatedProject.id}`} class="end-link">
+                Project: {relatedProject.name} →
+              </a>
+            )}
+          </div>
+        </div>
+      )}
+    </aside>
+
+  </div>
+</Base>
+
+<style>
+  /* Reading measure: ~41rem wrap gives a 38rem (~75 character) column. */
+  .post-wrap { max-width: 41rem; padding-top: 2.5rem; padding-bottom: 6rem; }
+
+  .post-back { margin-bottom: 1.5rem; }
+
+  .post-header {
+    border-top: 2px solid var(--color-rule);
+    padding-top: 2rem;
+    margin-bottom: 3rem;
+  }
+
+  .post-title {
+    font-size: clamp(2rem, 1.4rem + 3vw, 3rem);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    line-height: 1.04;
+    color: var(--color-text);
+    margin: 0 0 1.25rem;
+    max-width: 22ch;
+    text-wrap: balance;
+  }
+
+  .post-desc {
+    font-size: var(--text-lg);
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    margin: 0 0 1.75rem;
+    max-width: 60ch;
+  }
+
+  .post-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.25rem;
+    border-top: 1px solid var(--color-line);
+    padding-top: 0.875rem;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+  }
+
+  /* ── End matter: the ruled close every post ends on ── */
+  .end-matter {
+    margin-top: 4.5rem;
+    border-top: 2px solid var(--color-rule);
+  }
+
+  .end-row {
+    display: grid;
+    grid-template-columns: 8rem 1fr;
+    gap: 0.25rem 2rem;
+    align-items: baseline;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--color-line);
+  }
+  /* The footer's 2px press rule closes the page; no trailing hairline above it. */
+  .end-row:last-child { border-bottom: 0; }
+
+  .end-label {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+    margin: 0;
+  }
+
+  .end-bio {
+    font-size: var(--text-base);
+    color: var(--color-text-muted);
+    line-height: 1.65;
+    margin: 0;
+  }
+
+  .end-name {
+    font-weight: 600;
+    color: var(--color-text);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.25em;
+    text-decoration-color: var(--color-text-faint);
+    transition: color 0.12s ease, text-decoration-color 0.12s ease;
+  }
+  .end-name:hover { color: var(--color-accent); text-decoration-color: var(--color-accent); }
+
+  .end-links { display: flex; flex-wrap: wrap; gap: 0 2rem; }
+  .end-links--stack { flex-direction: column; gap: 0.25rem; }
+
+  .end-link {
+    display: inline-block;
+    padding-block: 0.25rem;
+    font-size: var(--text-base);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: var(--color-text);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.25em;
+    text-decoration-color: var(--color-text-faint);
+    transition: color 0.12s ease, text-decoration-color 0.12s ease;
+  }
+  .end-link:hover { color: var(--color-accent); text-decoration-color: var(--color-accent); }
+
+  @media (max-width: 640px) {
+    .post-wrap { padding-top: 1.5rem; }
+    .post-desc { font-size: var(--text-base); }
+    .end-row { grid-template-columns: 1fr; padding: 1rem 0; }
+  }
+</style>

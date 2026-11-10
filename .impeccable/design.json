@@ -1,0 +1,335 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-09T22:50:00Z",
+  "title": "Design System: alexbotzis.tech",
+  "extensions": {
+    "colorMeta": {
+      "bauhaus-signal-red": {
+        "role": "primary",
+        "displayName": "Bauhaus Signal Red",
+        "canonical": "#D9281F",
+        "tonalRamp": [
+          "#3B0B08",
+          "#5E120D",
+          "#8A1A13",
+          "#B52119",
+          "#D9281F",
+          "#E8665F",
+          "#F3A8A3",
+          "#FBE3E1"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "canonical": "#FFFFFF",
+        "tonalRamp": [
+          "#111111",
+          "#2B2B2B",
+          "#555555",
+          "#707070",
+          "#DEDEDE",
+          "#EBEBEB",
+          "#F4F4F4",
+          "#FFFFFF"
+        ]
+      },
+      "newsprint-tint": {
+        "role": "neutral",
+        "displayName": "Newsprint Tint",
+        "canonical": "#F4F4F4"
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "#DEDEDE"
+      },
+      "press-rule": {
+        "role": "neutral",
+        "displayName": "Press Rule",
+        "canonical": "#111111"
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#111111"
+      },
+      "ink-muted": {
+        "role": "neutral",
+        "displayName": "Ink Muted",
+        "canonical": "#555555"
+      },
+      "ink-faint": {
+        "role": "neutral",
+        "displayName": "Ink Faint",
+        "canonical": "#707070"
+      },
+      "night-paper": {
+        "role": "neutral",
+        "displayName": "Night Paper",
+        "canonical": "#0C0C0B",
+        "tonalRamp": [
+          "#0C0C0B",
+          "#161615",
+          "#333330",
+          "#82827D",
+          "#A3A39E",
+          "#C0C0BB",
+          "#D8D8D4",
+          "#EDEDEA"
+        ]
+      },
+      "night-tint": {
+        "role": "neutral",
+        "displayName": "Night Tint",
+        "canonical": "#161615"
+      },
+      "night-hairline": {
+        "role": "neutral",
+        "displayName": "Night Hairline",
+        "canonical": "#333330"
+      },
+      "night-rule": {
+        "role": "neutral",
+        "displayName": "Night Rule",
+        "canonical": "#D8D8D4"
+      },
+      "night-ink": {
+        "role": "neutral",
+        "displayName": "Night Ink",
+        "canonical": "#EDEDEA"
+      },
+      "night-ink-muted": {
+        "role": "neutral",
+        "displayName": "Night Ink Muted",
+        "canonical": "#A3A39E"
+      },
+      "night-ink-faint": {
+        "role": "neutral",
+        "displayName": "Night Ink Faint",
+        "canonical": "#82827D"
+      },
+      "night-signal-red": {
+        "role": "primary",
+        "displayName": "Night Signal Red",
+        "canonical": "#E5483F"
+      },
+      "laser-hot": {
+        "role": "tertiary",
+        "displayName": "Laser Hot",
+        "canonical": "#FF7A45",
+        "note": "Transient only, during the signature etch; #FFE4D2 in dark theme."
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Homepage hero headline only."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Page-header statements (About)."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Post titles in lists."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "All running copy; 1.8 leading inside articles."
+      },
+      "page-label": {
+        "displayName": "Page Label",
+        "purpose": "Uppercase mono word in the left column of page headers; mobile menu items."
+      },
+      "numeral": {
+        "displayName": "Numeral",
+        "purpose": "Red mono counts in page headers (years, entries, works)."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Uppercase mono nav, dates, tags, kickers, row labels, footer links."
+      },
+      "post-title": {
+        "displayName": "Post Title",
+        "purpose": "Article h1; 22ch, balanced."
+      },
+      "feature-title": {
+        "displayName": "Feature Title",
+        "purpose": "Homepage feature post and featured project name."
+      },
+      "page-label-compact": {
+        "displayName": "Page Label Compact",
+        "purpose": "Masthead label under 640px; Writing masthead date figure."
+      }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "ease-entrance",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "fadeUp page entrance, 0.6s, staggered in 0.08s steps."
+      },
+      {
+        "name": "hover-color",
+        "value": "color 0.12s ease",
+        "purpose": "Text color shift to red on links."
+      },
+      {
+        "name": "hover-tint",
+        "value": "background 0.1s ease",
+        "purpose": "Newsprint Tint fill behind rows on hover."
+      },
+      {
+        "name": "menu",
+        "value": "opacity 0.2s ease, transform 0.2s ease",
+        "purpose": "Mobile menu open/close, 6px vertical travel."
+      },
+      {
+        "name": "signature-laser",
+        "value": "rAF tip along getPointAtLength over 2600ms (cubic in-out blended 35% with linear); trails: core 5px, heat 26px, ember 80px; switch-off 520ms",
+        "purpose": "Laser-etched gestural signature under the homepage bio; the site's single authored motion moment and only (transient) glow."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Nav Link",
+      "kind": "nav",
+      "refersTo": "nav-link",
+      "description": "Mono uppercase nav item; muted at rest, red on hover and when active.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-nav-link\" href=\"#\">About</a><a class=\"ds-nav-link is-active\" href=\"#\">Projects</a><a class=\"ds-nav-link\" href=\"#\">Writing</a></nav>",
+      "css": ".ds-nav { display: flex; gap: 2rem; padding: 1rem 0; border-bottom: 2px solid var(--color-rule, #111111); } .ds-nav-link { font-family: 'JetBrains Mono Variable', ui-monospace, monospace; font-size: 0.6875rem; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; color: var(--color-text-muted, #555555); transition: color 0.12s ease; } .ds-nav-link:hover, .ds-nav-link.is-active { color: var(--color-accent, #D9281F); } .ds-nav-link:focus-visible { outline: 2px solid var(--color-accent, #D9281F); outline-offset: 2px; }"
+    },
+    {
+      "name": "Contact Link",
+      "kind": "custom",
+      "refersTo": "text-link",
+      "description": "Geist link with hairline underline; text and underline turn red on hover.",
+      "html": "<a class=\"ds-contact-link\" href=\"#\">LinkedIn ↗</a>",
+      "css": ".ds-contact-link { font-family: 'Geist Variable', system-ui, sans-serif; font-size: 1rem; font-weight: 500; letter-spacing: -0.01em; color: var(--color-text, #111111); text-decoration: none; border-bottom: 1px solid var(--color-line, #DEDEDE); padding-bottom: 0.1em; transition: color 0.12s ease, border-color 0.12s ease; } .ds-contact-link:hover { color: var(--color-accent, #D9281F); border-color: var(--color-accent, #D9281F); } .ds-contact-link:focus-visible { outline: 2px solid var(--color-accent, #D9281F); outline-offset: 2px; }"
+    },
+    {
+      "name": "Post Row",
+      "kind": "card",
+      "refersTo": "row-card",
+      "description": "List row for a post: title, mono date, description, mono tags; hairline below, title turns red on hover.",
+      "html": "<a class=\"ds-post-row\" href=\"#\"><div class=\"ds-post-head\"><span class=\"ds-post-title\">Pre-filter vs Post-filter Retrieval in RAG</span><time class=\"ds-post-date\">29 Oct 2026</time></div><p class=\"ds-post-desc\">The code passed all tests. The security hole was invisible.</p><span class=\"ds-post-tag\">AI</span><span class=\"ds-post-tag\">Security</span></a>",
+      "css": ".ds-post-row { display: block; padding: 1.5rem 0; border-bottom: 1px solid var(--color-line, #DEDEDE); text-decoration: none; } .ds-post-head { display: flex; justify-content: space-between; align-items: baseline; gap: 2rem; margin-bottom: 0.375rem; } .ds-post-title { font-family: 'Geist Variable', system-ui, sans-serif; font-size: 1.25rem; font-weight: 600; letter-spacing: -0.02em; line-height: 1.2; color: var(--color-text, #111111); transition: color 0.12s ease; } .ds-post-row:hover .ds-post-title { color: var(--color-accent, #D9281F); } .ds-post-row:focus-visible { outline: 2px solid var(--color-accent, #D9281F); outline-offset: 2px; } .ds-post-date, .ds-post-tag { font-family: 'JetBrains Mono Variable', ui-monospace, monospace; font-size: 0.6875rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-text-faint, #707070); white-space: nowrap; } .ds-post-tag { margin-right: 1.25rem; } .ds-post-desc { font-size: 0.8125rem; line-height: 1.65; color: var(--color-text-muted, #555555); margin: 0 0 0.75rem; }"
+    },
+    {
+      "name": "Feature Post",
+      "kind": "card",
+      "refersTo": "row-card-hover",
+      "description": "Lead post on the homepage; headline title, Geist deck, mono foot row with the red Read action; tints to Newsprint on hover, closes with a press rule.",
+      "html": "<a class=\"ds-feature\" href=\"#\"><span class=\"ds-feature-title\">Pre-filter vs Post-filter Retrieval in RAG</span><span class=\"ds-feature-cta\">Read →</span></a>",
+      "css": ".ds-feature { display: block; padding: 3rem 0; border-bottom: 2px solid var(--color-rule, #111111); text-decoration: none; transition: background 0.1s ease; } .ds-feature:hover { background: var(--color-surface, #F4F4F4); } .ds-feature:focus-visible { outline: 2px solid var(--color-accent, #D9281F); outline-offset: 2px; } .ds-feature-kicker, .ds-feature-cta { display: block; font-family: 'JetBrains Mono Variable', ui-monospace, monospace; font-size: 0.6875rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-accent, #D9281F); } .ds-feature-title { display: block; margin: 0.75rem 0 1.25rem; max-width: 22ch; font-family: 'Geist Variable', system-ui, sans-serif; font-size: 2rem; font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; color: var(--color-text, #111111); }"
+    },
+    {
+      "name": "Page Header",
+      "kind": "custom",
+      "refersTo": "page-header",
+      "description": "Broadsheet masthead for top-level pages: mono page label, 2px vertical rule, statement plus red numeral.",
+      "html": "<div class=\"ds-ph\"><span class=\"ds-ph-label\">About</span><span class=\"ds-ph-rule\"></span><div class=\"ds-ph-right\"><span class=\"ds-ph-headline\">I build software, and the teams that build it.</span><span class=\"ds-ph-count\"><span class=\"ds-ph-num\">10</span><span class=\"ds-ph-cap\">Years of experience</span></span></div></div>",
+      "css": ".ds-ph { display: grid; grid-template-columns: 55% 2px 1fr; padding: 2rem 0; border-bottom: 2px solid var(--color-rule, #111111); } .ds-ph-label { font-family: 'JetBrains Mono Variable', ui-monospace, monospace; font-size: 2.5rem; line-height: 0.95; letter-spacing: -0.03em; text-transform: uppercase; color: var(--color-text, #111111); } .ds-ph-rule { background: var(--color-rule, #111111); min-height: 7rem; } .ds-ph-right { padding-left: 3rem; display: flex; flex-direction: column; justify-content: space-between; gap: 1.5rem; } .ds-ph-headline { font-family: 'Geist Variable', system-ui, sans-serif; font-size: 2rem; font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; color: var(--color-text, #111111); text-wrap: balance; } .ds-ph-count { display: flex; align-items: baseline; gap: 0.5rem; } .ds-ph-num { font-family: 'JetBrains Mono Variable', ui-monospace, monospace; font-size: 4.5rem; line-height: 1; letter-spacing: -0.02em; color: var(--color-accent, #D9281F); } .ds-ph-cap { font-family: 'JetBrains Mono Variable', ui-monospace, monospace; font-size: 0.6875rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-text-faint, #707070); }"
+    },
+    {
+      "name": "Inline Code",
+      "kind": "chip",
+      "refersTo": "inline-code",
+      "description": "Mono inline code on Newsprint Tint with a hairline border, square corners.",
+      "html": "<p class=\"ds-p\">Filter by <code class=\"ds-code\">tenant_id</code> before the vector search.</p>",
+      "css": ".ds-p { font-family: 'Geist Variable', system-ui, sans-serif; font-size: 1rem; line-height: 1.8; color: var(--color-text, #111111); } .ds-code { font-family: 'JetBrains Mono Variable', ui-monospace, monospace; font-size: 0.875em; background: var(--color-surface, #F4F4F4); border: 1px solid var(--color-line, #DEDEDE); padding: 0.1rem 0.35rem; }"
+    },
+    {
+      "name": "Email Contact",
+      "kind": "custom",
+      "refersTo": "text-link",
+      "description": "mailto link plus a mono Copy button with an inline aria-live status.",
+      "html": "<span class=\"ds-email\"><a class=\"ds-email-link\" href=\"mailto:hello@alexbotzis.tech\">hello@alexbotzis.tech</a><button class=\"ds-email-copy\" type=\"button\">Copy</button><span class=\"ds-email-status\" role=\"status\">Copied</span></span>",
+      "css": ".ds-email { display: inline-flex; gap: 1rem; align-items: baseline; } .ds-email-link { font-family: 'Geist Variable', system-ui, sans-serif; font-weight: 500; color: var(--color-text, #111111); text-decoration: none; border-bottom: 1px solid var(--color-line, #DEDEDE); transition: color 0.12s ease, border-color 0.12s ease; } .ds-email-link:hover { color: var(--color-accent, #D9281F); border-color: var(--color-accent, #D9281F); } .ds-email-copy, .ds-email-status { background: none; border: none; padding: 0.5rem 0; font-family: 'JetBrains Mono Variable', ui-monospace, monospace; font-size: 0.6875rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-text-faint, #707070); cursor: pointer; } .ds-email-copy:hover { color: var(--color-accent, #D9281F); } .ds-email-copy:focus-visible, .ds-email-link:focus-visible { outline: 2px solid var(--color-accent, #D9281F); outline-offset: 2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Engineer's Broadsheet",
+    "overview": "The site is laid out like a broadsheet edited by an engineer. Pages are built from rules, columns, and typographic hierarchy, not from boxes, cards, or imagery. A heavy 2px rule marks every structural boundary (header, page header, hero, footer), and 1px hairlines divide content inside those boundaries. Mono uppercase labels play the role of datelines and section slugs; large mono numerals act like column figures.\n\nThe palette is newsprint: near-black ink on white paper, three grades of grey ink, and a single Bauhaus Signal Red that marks the one or two things on a page that matter most. The density is editorial rather than app-like: generous vertical rhythm between sections, tight leading in headlines, comfortable leading in body copy, and line lengths held to reading measure.\n\nInteraction is quiet until touched. At rest everything is ink and grey; a hover or focus answers with a single decisive response, either red text or a faint newsprint tint behind a row. There is no decoration that isn't also structure.",
+    "keyCharacteristics": [
+      "Two-weight rule system: 2px press rules for structure, 1px hairlines for division.",
+      "Zero corner radius, globally enforced.",
+      "Flat surfaces; depth comes from rules and tint, never shadows.",
+      "Geist for reading, JetBrains Mono for labels, figures, and metadata.",
+      "One accent, used sparingly; full light and dark themes via `data-theme`."
+    ],
+    "rules": [
+      {
+        "name": "The Two-Strikes Rule",
+        "body": "Bauhaus Signal Red appears at most twice per page at rest, the active nav item included. Hover and focus states don't count, because they are responses, not composition.",
+        "section": "colors"
+      },
+      {
+        "name": "The AA-Floor Rule",
+        "body": "Every text color passes 4.5:1 against both Paper and Newsprint Tint in its theme, including code tokens. Contrast is checked per theme, never assumed from the light one.",
+        "section": "colors"
+      },
+      {
+        "name": "The Ink-Grade Rule",
+        "body": "Hierarchy in text is carried by the three ink grades (ink, muted, faint) before size or weight. A new element picks its grade by importance: content, supporting copy, or metadata.",
+        "section": "colors"
+      },
+      {
+        "name": "The No-Kicker Rule",
+        "body": "Headings carry their own weight. No eyebrow or kicker label above a heading; metadata (date, tags, reading time) goes in a mono row below it.",
+        "section": "typography"
+      },
+      {
+        "name": "The Mono-Means-Metadata Rule",
+        "body": "JetBrains Mono is for things a reader scans, never for sentences. If it's longer than about six words, it's set in Geist.",
+        "section": "typography"
+      },
+      {
+        "name": "The Negative-Tracking Rule",
+        "body": "Geist at title size and above is always tracked tight (-0.02em to -0.03em). Mono labels are always tracked open (0.04em to 0.12em).",
+        "section": "typography"
+      },
+      {
+        "name": "The Rule-Not-Box Rule",
+        "body": "Group content with a rule above it, not a container around it. If a new section needs a border on all four sides, it's the wrong pattern.",
+        "section": "layout"
+      },
+      {
+        "name": "The Flat-Press Rule",
+        "body": "Nothing floats. If an element needs to feel \"above\" another, give it a heavier rule, not a shadow.",
+        "section": "elevation"
+      },
+      {
+        "name": "The One-Signature Rule",
+        "body": "The signature signing is the only authored motion moment on the site; everything else uses the shared fade-up entrance.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do separate structural regions with a 2px Press Rule and content items with a 1px Hairline.",
+      "Do set labels, dates, tags, and counts in JetBrains Mono uppercase at 0.6875rem with open tracking.",
+      "Do keep Bauhaus Signal Red to two uses per page at rest (Two-Strikes Rule).",
+      "Do respond to hover with either red text or a Newsprint Tint fill, at 0.1 to 0.15s.",
+      "Do define every new color as a token with a `night-*` counterpart so dark mode keeps working.",
+      "Do cap reading measure at 60 to 68ch."
+    ],
+    "donts": [
+      "Don't round corners. Radius is globally 0 and must stay that way.",
+      "Don't add shadows, glows, or blur to express depth.",
+      "Don't introduce a second accent color.",
+      "Don't set sentences in mono or labels in Geist.",
+      "Don't wrap content sections in fully bordered boxes or filled cards at rest.",
+      "Don't use font sizes below the label token (0.6875rem) for readable text.",
+      "Don't put a kicker or eyebrow label above a heading.",
+      "Don't number rows or sections (01, 02...) unless the sequence is information."
+    ]
+  }
+}

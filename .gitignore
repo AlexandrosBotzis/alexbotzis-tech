@@ -1,0 +1,20 @@
+# deps & build output
+node_modules/
+dist/
+.astro/
+
+# env
+.env
+.env.*
+!.env.example
+
+# local tooling
+.claude/settings.local.json
+.vercel/
+
+# OS / editor
+.DS_Store
+*.log
+
+# design-tool caches (local only)
+.impeccable/hook.cache.json

@@ -1,0 +1,106 @@
+---
+// Email as a real mailto link, plus an explicit Copy button with an
+// inline, announced status. Works on touch, keyboard, and screen readers.
+import { email } from '@/data/site';
+
+interface Props {
+  variant?: 'mono' | 'contact';
+}
+const { variant = 'mono' } = Astro.props;
+---
+
+<span class={`email email--${variant}`} data-email-contact>
+  <a href={`mailto:${email}`} class="email-link">{email}</a>
+  <button type="button" class="email-copy" data-copy={email}>Copy</button>
+  <span class="email-status" role="status" aria-live="polite"></span>
+</span>
+
+<style>
+  .email {
+    display: inline-flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0 1rem;
+  }
+
+  .email-link {
+    color: var(--color-text);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.25em;
+    text-decoration-color: var(--color-text-faint);
+    padding-block: 0.25rem;
+    transition: color 0.12s ease, text-decoration-color 0.12s ease;
+  }
+  .email-link:hover { color: var(--color-accent); text-decoration-color: var(--color-accent); }
+
+  .email--mono .email-link {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.04em;
+  }
+
+  .email--contact .email-link {
+    font-size: var(--text-base);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  .email-copy {
+    background: none;
+    border: none;
+    padding: 0.5rem 0;
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.25em;
+    text-decoration-color: var(--color-text-faint);
+    transition: color 0.12s ease, text-decoration-color 0.12s ease;
+  }
+  .email-copy:hover { color: var(--color-accent); text-decoration-color: var(--color-accent); }
+
+  .email-status {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+  .email-status:empty { display: none; }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-email-contact]').forEach((root) => {
+    const button = root.querySelector<HTMLButtonElement>('.email-copy');
+    const status = root.querySelector<HTMLElement>('.email-status');
+    const link = root.querySelector<HTMLAnchorElement>('.email-link');
+    if (!button || !status || !link) return;
+
+    let timer: number | undefined;
+    const show = (message: string) => {
+      status.textContent = message;
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => { status.textContent = ''; }, 2500);
+    };
+
+    button.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(button.dataset.copy ?? '');
+        show('Copied');
+      } catch {
+        // Clipboard blocked (permissions, insecure context): select the address instead.
+        const range = document.createRange();
+        range.selectNodeContents(link);
+        const selection = window.getSelection();
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+        show('Selected, press Ctrl/Cmd+C');
+      }
+    });
+  });
+</script>
