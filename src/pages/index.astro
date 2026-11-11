@@ -359,10 +359,9 @@ const [feature, ...morePosts] = posts;
 
   /* ── Mobile ── */
   @media (max-width: 640px) {
-    .hero-top { padding: 2rem 0 1.5rem; }
+    .hero-top { padding: 2.5rem 0 1.75rem; }
     .hero-headline { font-size: clamp(1.75rem, 7vw, 2.25rem); }
     .hero-bottom { grid-template-columns: 1fr; gap: 1.25rem 0; padding: 1.25rem 0; }
-    .hero-p { font-size: var(--text-sm); }
     /* Keep the facts on phones as a compact row under the bio. */
     .hero-meta {
       flex-direction: row;
@@ -373,11 +372,11 @@ const [feature, ...morePosts] = posts;
       padding: 1rem 0 0;
     }
 
-    .feature { margin-top: 2rem; padding: 1.75rem 0; }
+    .feature { margin-top: 3rem; padding: 2rem 0; }
     .feature-desc { font-size: var(--text-base); }
     .feature-all { margin-left: 0; }
 
-    .more-posts, .works { margin-top: 2.5rem; }
+    .more-posts, .works { margin-top: 3rem; }
     .more-grid { grid-template-columns: 1fr; }
     .more-card { border-right: none; border-bottom: 1px solid var(--color-line); padding: 1.25rem 0; }
     .more-card:last-child { border-bottom: none; }

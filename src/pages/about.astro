@@ -204,8 +204,9 @@ const hasCv = existsSync(join(process.cwd(), 'public', cvPath));
 
   @media (max-width: 640px) {
     .headline { font-size: 1.4rem; }
-    .content-row { grid-template-columns: 1fr; gap: 0.5rem; padding: 1.5rem 0; }
-    .row-body p { font-size: var(--text-sm); }
+    /* Mobile rhythm: a scaled-down desktop, not a halved one. */
+    .content-row { grid-template-columns: 1fr; gap: 0.75rem; padding: 2rem 0; }
+    .row-body p { margin-bottom: 1.25rem; }
     /* Phones: label above its list, still hairline-separated rows. */
     .stack-item { grid-template-columns: 1fr; gap: 0.2rem; }
   }
