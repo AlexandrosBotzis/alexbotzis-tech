@@ -32,9 +32,9 @@ const showCount = projects.length >= 3;
       const related = postTitle(p.data.post);
       const slug = projectSlug(p.id);
       return (
-        <section class="feature-project" id={slug} aria-labelledby={`${slug}-name`}>
+        <section class="feature-project reveal" id={slug} aria-labelledby={`${slug}-name`}>
           <div class="feature-body">
-            <h2 class="feature-name" id={`${slug}-name`}><a href={projectHref(p.id)}>{projectTitle(p.data)}</a></h2>
+            <h2 class="feature-name" id={`${slug}-name`} style={`view-transition-name: project-${slug}`}><a href={projectHref(p.id)}>{projectTitle(p.data)}</a></h2>
             <p class="feature-desc">{p.data.summary}</p>
             <div class="feature-actions">
               <a href={projectHref(p.id)} class="mono-link">Read the case study →</a>

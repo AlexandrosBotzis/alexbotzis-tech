@@ -37,9 +37,9 @@ const latestLabel = latest?.toLocaleDateString('en-GB', { month: 'short', year: 
   <div class="max-w-5xl mx-auto px-6 animate-fade-up delay-2" style="padding-bottom: 6rem;">
     <div class="post-list">
       {posts.map(post => (
-        <a href={`/blog/${postSlug(post.id)}`} class="post-row bleed-row">
+        <a href={`/blog/${postSlug(post.id)}`} class="post-row bleed-row reveal">
           <div class="post-body">
-            <h2 class="post-title">{keepHyphens(post.data.title)}</h2>
+            <h2 class="post-title" style={`view-transition-name: post-${postSlug(post.id)}`}>{keepHyphens(post.data.title)}</h2>
             <p class="post-desc">{post.data.description}</p>
             <span class="post-read" aria-hidden="true">Read →</span>
           </div>

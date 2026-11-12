@@ -304,6 +304,12 @@ Contact and follow links are deliberately left out: the footer directly below ca
 ### Case study (projects)
 Projects are a content collection (`src/content/projects/*.md`), one page each at `/projects/<slug>`, on the post reading measure (~38rem). Header: `← Projects`, 2px rule, the full "Name: descriptor" title in one style (same text as everywhere else on the site), muted summary, then a spec sheet (faint mono label | value in ink, hairlines, closed by a 2px rule). Optional facts (Role, Year, Status, Links) render only when set, never as placeholders. Body is prose: what it does, key decisions, what building it taught. Every project link on the site (homepage, /projects, a post's Related row) points to the case study.
 
+### Page transitions
+Native cross-document view transitions (`@view-transition { navigation: auto }`), CSS only, no JS router. The masthead (`#site-header`) stays perfectly still; the page under it clears (0.13s, fade and lift 8px) and then the new page settles (0.3s, from 12px below, ease-out). Sequential, never a cross-fade. The one flourish: item titles share a `view-transition-name` (`post-<slug>`, `project-<slug>`) with the headline of the page they open, so the title glides into place. Per-page fade-ups are skipped after a transition (`.vt-nav`, set on `pagereveal`). Reduced motion turns transitions off entirely. Browsers without support (Firefox) navigate instantly. No curtains, wipes or colored overlays between pages.
+
+### Scroll reveal
+List content (homepage section heads, the feature post, project items, Writing rows, Projects entries) rises 24px and fades in once, the first time it enters the viewport (0.7s, ease-out). It never reverses. Mark items with `.reveal` (never the sections that carry the load fade-up); a small IntersectionObserver in `Base.astro` hides only items that start below the viewport, then reveals each once and stops watching it. Content on screen at load is never hidden. No JS or reduced motion: content is simply present.
+
 ### Homepage section heads
 "Latest writing" and "Selected work" are real headings, not faint mono labels: Geist 700, clamp 1.75 to 2.5rem, -0.035em, ink, over a 2px press rule, with the "All writing →" link on the right of the bar. Item titles under them (feature post, project) stay smaller so the section head reads as the parent.
 

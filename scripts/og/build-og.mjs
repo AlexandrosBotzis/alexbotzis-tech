@@ -31,7 +31,7 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630">
   <text x="80" y="420" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="76" font-weight="700" fill="#111111" letter-spacing="-2">Engineering decisions</text>
   <text x="80" y="505" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="76" font-weight="700" fill="#111111" letter-spacing="-2">that aren't obvious.</text>
   <rect x="80" y="550" width="1040" height="2" fill="#111111"/>
-  <text x="80" y="592" font-family="Menlo, monospace" font-size="24" fill="#555555">Alex Botzis · Senior Full-Stack Engineer</text>
+  <text x="80" y="592" font-family="Menlo, monospace" font-size="24" fill="#555555">Alex Botzis · Senior FullStack Engineer</text>
   <text x="1120" y="592" text-anchor="end" font-family="Menlo, monospace" font-size="24" fill="#111111">alexbotzis<tspan fill="#D9281F">.</tspan>tech</text>
 </svg>`;
 

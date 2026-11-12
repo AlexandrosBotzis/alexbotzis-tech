@@ -33,7 +33,7 @@ const facts = [
     </div>
 
     <header class="case-header animate-fade-up">
-      <h1 class="case-title">{keepHyphens(projectTitle(project.data))}</h1>
+      <h1 class="case-title" style={`view-transition-name: project-${projectSlug(project.id)}`}>{keepHyphens(projectTitle(project.data))}</h1>
       <p class="case-summary">{summary}</p>
 
       <dl class="case-spec">

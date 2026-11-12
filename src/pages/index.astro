@@ -3,7 +3,7 @@ import Base from '@/layouts/Base.astro';
 import Signature from '@/components/Signature.astro';
 import { getCollection } from 'astro:content';
 import { postSlug, formatDate, keepHyphens } from '@/data/site';
-import { getProjects, projectHref, projectTitle } from '@/data/projects';
+import { getProjects, projectHref, projectSlug, projectTitle } from '@/data/projects';
 
 const allPosts = (await getCollection('blog', ({ data }) => !data.draft))
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
@@ -42,16 +42,16 @@ const projects = await getProjects();
     <!-- ── Feature post: the page's one action ── -->
     {feature && (
       <section class="writing animate-fade-up delay-1" aria-labelledby="latest-writing">
-      <div class="section-header">
+      <div class="section-header reveal">
         <h2 class="section-label" id="latest-writing">Latest writing</h2>
         <a href="/blog" class="mono-link">All writing →</a>
       </div>
-      <article class="feature">
+      <article class="feature reveal">
         <p class="feature-dateline">
           <time datetime={feature.data.pubDate.toISOString()}>{formatDate(feature.data.pubDate)}</time>
           {feature.data.tags[0] && <span>{feature.data.tags[0]}</span>}
         </p>
-        <h3 class="feature-title">
+        <h3 class="feature-title" style={`view-transition-name: post-${postSlug(feature.id)}`}>
           <a href={`/blog/${postSlug(feature.id)}`} class="feature-link">{keepHyphens(feature.data.title)}</a>
         </h3>
         <p class="feature-desc">{feature.data.description}</p>
@@ -66,12 +66,12 @@ const projects = await getProjects();
     <!-- ── More posts ── -->
     {morePosts.length > 0 && (
       <section class="more-posts animate-fade-up delay-2" aria-labelledby="more-writing">
-        <div class="section-header">
+        <div class="section-header reveal">
           <h2 class="section-label" id="more-writing">More writing</h2>
         </div>
         <div class="more-grid" style={`--cols: ${morePosts.length}`}>
           {morePosts.map(post => (
-            <a href={`/blog/${postSlug(post.id)}`} class="more-card">
+            <a href={`/blog/${postSlug(post.id)}`} class="more-card reveal">
               <h3 class="more-title">{keepHyphens(post.data.title)}</h3>
               <p class="more-desc">{post.data.description}</p>
               <time class="more-date" datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate)}</time>
@@ -83,15 +83,15 @@ const projects = await getProjects();
 
     <!-- ── Projects: credibility ── -->
     <section class="works animate-fade-up delay-3" aria-labelledby="selected-work">
-      <div class="section-header">
+      <div class="section-header reveal">
         <h2 class="section-label" id="selected-work">Selected work</h2>
         <a href="/projects" class="mono-link">All projects →</a>
       </div>
       <div class="works-list">
         {projects.map(p => (
-          <article class="work">
+          <article class="work reveal">
             <div class="work-body">
-              <h3 class="work-name"><a href={projectHref(p.id)}>{projectTitle(p.data)}</a></h3>
+              <h3 class="work-name" style={`view-transition-name: project-${projectSlug(p.id)}`}><a href={projectHref(p.id)}>{projectTitle(p.data)}</a></h3>
               <p class="work-desc">{p.data.summary}</p>
               <dl class="work-spec">
                 <div class="spec-row">
@@ -155,7 +155,8 @@ const projects = await getProjects();
   /* The signature line: a 2px press rule the name is signed onto. */
   .cover-sign { display: flex; flex-direction: column; align-items: flex-start; }
   /* Clear air between the signature's lowest stroke and the signature line. */
-  .cover-sign :global(.signature) { margin: 0 0 -0.15rem; }
+  /* Clear air between the etched signature (and its tail link) and the signature line. */
+  .cover .cover-sign :global(.signature) { margin: 0 0 1.25rem; }
   .cover-line {
     display: block;
     width: 100%;
@@ -228,7 +229,7 @@ const projects = await getProjects();
 
   /* ── Section headers ── */
   /* Chapter break: clearly larger than any gap inside a section. */
-  .more-posts, .works { margin-top: clamp(4.5rem, 3rem + 5vw, 7rem); }
+  .more-posts, .works { margin-top: clamp(6.5rem, 5rem + 4vw, 8.5rem); }
 
   /* Section bar: a real heading in ink over a 2px press rule (broadsheet section head). */
   .section-header {

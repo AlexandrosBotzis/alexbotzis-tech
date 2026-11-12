@@ -2,8 +2,8 @@
 
 export const author = {
   name: 'Alex Botzis',
-  role: 'Senior Full-Stack Engineer',
-  bio: 'Senior Full-Stack Engineer with an information-security background, applied to AI systems: finding the failure modes that pass every test.',
+  role: 'Senior FullStack Engineer',
+  bio: 'Senior FullStack Engineer with an information-security background, applied to AI systems.',
 };
 
 export const email = 'hello@alexbotzis.tech';

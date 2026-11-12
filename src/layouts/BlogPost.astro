@@ -31,7 +31,7 @@ const relatedProject = (await getProjects()).find(p => p.data.post === slug);
     </div>
 
     <header class="post-header animate-fade-up">
-      <h1 class="post-title">{keepHyphens(title)}</h1>
+      <h1 class="post-title" style={`view-transition-name: post-${slug}`}>{keepHyphens(title)}</h1>
       <p class="post-desc">{description}</p>
 
       <div class="post-meta">

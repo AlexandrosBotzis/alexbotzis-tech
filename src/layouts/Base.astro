@@ -13,7 +13,7 @@ interface Props {
 
 const {
   title,
-  description = 'Senior Full-Stack Engineer writing about engineering, leadership, and building software that lasts.',
+  description = 'Senior FullStack Engineer writing about engineering, leadership, and building software that lasts.',
   ogImage = '/og.png',
   article,
 } = Astro.props;
@@ -57,6 +57,10 @@ const pageTitle = title === 'Alex Botzis' ? title : `${title} · Alex Botzis`;
         var stored = null;
         try { stored = localStorage.getItem('theme'); } catch (e) {}
         document.documentElement.setAttribute('data-theme', stored === 'dark' ? 'dark' : 'light');
+        // Arriving via a view transition: let the transition be the entrance.
+        window.addEventListener('pagereveal', function (e) {
+          if (e.viewTransition) document.documentElement.classList.add('vt-nav');
+        });
       })();
     </script>
   </head>
@@ -66,5 +70,27 @@ const pageTitle = title === 'Alex Botzis' ? title : `${title} · Alex Botzis`;
       <slot />
     </main>
     <Footer />
+    <script>
+      // One-time scroll reveal for `.reveal` items (see DESIGN.md "Scroll reveal").
+      // Items already on screen are left alone, so nothing is hidden at first paint.
+      const items = [...document.querySelectorAll<HTMLElement>('.reveal')];
+      const motionOk = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (motionOk && 'IntersectionObserver' in window && items.length) {
+        const io = new IntersectionObserver((entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            const el = entry.target as HTMLElement;
+            el.classList.replace('reveal-pending', 'reveal-in');
+            el.addEventListener('animationend', () => el.classList.remove('reveal-in'), { once: true });
+            io.unobserve(el);
+          }
+        }, { rootMargin: '0px 0px -8% 0px' });
+        for (const el of items) {
+          if (el.getBoundingClientRect().top < innerHeight) continue;
+          el.classList.add('reveal-pending');
+          io.observe(el);
+        }
+      }
+    </script>
   </body>
 </html>
