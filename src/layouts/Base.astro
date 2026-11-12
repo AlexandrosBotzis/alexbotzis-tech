@@ -65,8 +65,9 @@ const pageTitle = title === 'Alex Botzis' ? title : `${title} · Alex Botzis`;
     </script>
   </head>
   <body>
+    <a href="#main" class="skip-link">Skip to content</a>
     <Nav />
-    <main>
+    <main id="main" tabindex="-1">
       <slot />
     </main>
     <Footer />

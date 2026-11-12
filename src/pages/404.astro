@@ -1,0 +1,43 @@
+---
+import Base from '@/layouts/Base.astro';
+import PageHeader from '@/components/PageHeader.astro';
+---
+
+<Base title="Page not found" description="This page isn't here.">
+  <div class="animate-fade-up">
+    <PageHeader title="404">
+      <p class="statement">This page isn't here.</p>
+      <p class="hint">The link may be old, or the address mistyped.</p>
+    </PageHeader>
+  </div>
+
+  <div class="max-w-5xl mx-auto px-6 recover">
+    <a href="/" class="mono-link">Home →</a>
+    <a href="/blog" class="mono-link">Writing →</a>
+    <a href="/projects" class="mono-link">Projects →</a>
+  </div>
+</Base>
+
+<style>
+  .statement {
+    font-size: clamp(1.4rem, 2.8vw, 2rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    color: var(--color-text);
+    margin: 0;
+  }
+  .hint { font-size: var(--text-base); color: var(--color-text-muted); margin: 0; }
+
+  .recover {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 2rem;
+    padding-top: 1.5rem;
+    padding-bottom: 6rem;
+  }
+
+  @media (max-width: 640px) {
+    .statement { font-size: 1.4rem; }
+  }
+</style>
