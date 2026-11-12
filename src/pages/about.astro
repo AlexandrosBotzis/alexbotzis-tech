@@ -4,7 +4,7 @@ import PageHeader from '@/components/PageHeader.astro';
 import { getCollection } from 'astro:content';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { postSlug } from '@/data/site';
+import { postSlug, keepHyphens } from '@/data/site';
 
 const stack = [
   { label: 'Backend', items: 'Go, Laravel, Node.js, Python, FastAPI, PHP' },
@@ -14,6 +14,18 @@ const stack = [
   { label: 'AI / RAG', items: 'RAG pipelines, LLM integration, vector indexing, permission-aware retrieval, Claude API' },
   { label: 'Infra', items: 'Docker, Kubernetes, GitLab CI/CD, OpenTelemetry, Vite, Webpack' },
   { label: 'Other', items: 'Supabase, Firebase, Keycloak, WordPress, Lokalise, Optimizely' },
+];
+
+const record = [
+  'Led internationalisation across multiple teams and markets.',
+  'Built shared component libraries to cut technical debt.',
+  'Mentored engineers and ran technical interviews.',
+];
+
+const principles = [
+  ['Decide before you build.', 'Write down the trade-off, then pick.'],
+  ['Security is a design input,', 'not a review step.'],
+  ['Prefer boring, explicit code.', 'Readability is a team asset.'],
 ];
 
 const latestPost = (await getCollection('blog', ({ data }) => !data.draft))
@@ -28,7 +40,7 @@ const hasCv = existsSync(join(process.cwd(), 'public', cvPath));
 
   <div class="animate-fade-up">
     <PageHeader title="About">
-      <p class="headline">I build software,<br/>and the teams<br/>that build it.</p>
+      <p class="headline">Security background,<br/>product engineering,<br/>AI systems.</p>
       <span class="exp-count">
         <span class="count-label">Since</span>
         <span class="count-num">2017</span>
@@ -38,25 +50,29 @@ const hasCv = existsSync(join(process.cwd(), 'public', cvPath));
 
   <div class="max-w-5xl mx-auto px-6 animate-fade-up delay-2" style="padding-bottom: 4rem;">
 
-    <section class="content-row" aria-labelledby="row-background">
-      <h2 class="row-label" id="row-background">Background</h2>
+    <section class="content-row" aria-labelledby="row-now">
+      <h2 class="row-label" id="row-now">Now</h2>
       <div class="row-body">
-        <p>I'm Alex Botzis, a Senior FullStack Engineer based in Greece. My academic background is in information security (MS, University of East London), and I bring that lens to AI systems: looking for the failure modes that pass every test and stay invisible.</p>
-        <p>Shipping production software since 2017, currently building B2C and B2B e-commerce at scale, 100% remote, within a microfrontend architecture. My current focus is AI and automation: systems and tooling that make teams faster, reduce friction, and improve developer experience.</p>
-        <p>I've also led internationalisation across multiple teams and markets, built shared component libraries to reduce technical debt, mentored engineers, and run technical interviews.</p>
+        <p class="lead">Senior FullStack Engineer building B2B and B2C e-commerce at scale, fully remote, shipping microfrontends and the APIs and services they depend on.</p>
+        <p>Lately: AI systems, where my information-security background (MS, University of East London) is most useful: finding the failure modes that pass every test.</p>
       </div>
     </section>
 
-    <section class="content-row" aria-labelledby="row-writing">
-      <h2 class="row-label" id="row-writing">Writing</h2>
+    <section class="content-row" aria-labelledby="row-record">
+      <h2 class="row-label" id="row-record">Track record</h2>
       <div class="row-body">
-        <p>I write about the decisions that shaped the things I've built: architecture trade-offs, what broke, what held, and what I'd do differently. Increasingly, that includes the shift from writing code to leading the people who do.</p>
-        <div class="row-links">
-          {latestPost && (
-            <a href={`/blog/${postSlug(latestPost.id)}`} class="contact-link">Latest: {latestPost.data.title} →</a>
-          )}
-          <a href="/blog" class="mono-link">All writing →</a>
-        </div>
+        <ul class="ruled-list">
+          {record.map(item => <li>{item}</li>)}
+        </ul>
+      </div>
+    </section>
+
+    <section class="content-row" aria-labelledby="row-how">
+      <h2 class="row-label" id="row-how">How I work</h2>
+      <div class="row-body">
+        <ul class="ruled-list">
+          {principles.map(([head, rest]) => <li><strong>{head}</strong> {rest}</li>)}
+        </ul>
       </div>
     </section>
 
@@ -71,7 +87,16 @@ const hasCv = existsSync(join(process.cwd(), 'public', cvPath));
             </div>
           ))}
         </dl>
-        <p class="stack-note">I care more about architecture and trade-offs than specific frameworks.</p>
+      </div>
+    </section>
+
+    <section class="content-row" aria-labelledby="row-writing">
+      <h2 class="row-label" id="row-writing">Writing</h2>
+      <div class="row-body">
+        <p>Long-form notes on the decisions behind the systems I build.</p>
+        {latestPost && (
+          <a href={`/blog/${postSlug(latestPost.id)}`} class="contact-link">Latest: {keepHyphens(latestPost.data.title)} →</a>
+        )}
       </div>
     </section>
 
@@ -130,14 +155,17 @@ const hasCv = existsSync(join(process.cwd(), 'public', cvPath));
   .content-row:first-child { border-top: none; }
   /* The footer's 2px press rule closes the page; no trailing hairline above it. */
 
+  /* Section titles: the mono label voice, promoted to a heading (ink, larger,
+     heavier). The Stack sub-labels stay small and faint, one level below. */
   .row-label {
     font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    font-weight: 400;
-    letter-spacing: 0.1em;
+    font-size: clamp(0.9375rem, 0.875rem + 0.3vw, 1.0625rem);
+    font-weight: 600;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: var(--color-text-faint);
-    padding-top: 0.3em;
+    line-height: 1.3;
+    color: var(--color-text);
+    padding-top: 0.15em;
     margin: 0;
   }
 
@@ -150,24 +178,25 @@ const hasCv = existsSync(join(process.cwd(), 'public', cvPath));
   }
   .row-body p:last-child { margin-bottom: 0; }
 
-  .row-links {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.25rem;
-    margin-top: 1rem;
-  }
+  /* Lead line in ink: the one sentence a skimmer must not miss. */
+  .row-body .lead { color: var(--color-text); }
 
-  .cv-link { display: inline-block; margin-top: 1rem; }
+  /* Hairline-ruled list (broadsheet spec rows, no bullets). */
+  .ruled-list { list-style: none; margin: 0; padding: 0; max-width: 60ch; }
+  .ruled-list li {
+    padding: 0.75rem 0;
+    border-top: 1px solid var(--color-line);
+    font-size: var(--text-base);
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    text-wrap: pretty;
+  }
+  .ruled-list li:first-child { border-top: none; padding-top: 0; }
+  .ruled-list strong { font-weight: 600; color: var(--color-text); }
 
   /* ── Stack ── */
-  /* Spec-sheet rows: faint mono label | list in ink (the Ink-Grade Rule:
-     content in ink, metadata faint). Hairlines between rows, none at the top. */
-  .stack-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    margin: 0 0 1.25rem;
-  }
+  /* Spec-sheet rows: faint mono label | list in ink, hairlines between rows. */
+  .stack-grid { display: grid; grid-template-columns: 1fr; margin: 0; }
   .stack-item {
     display: grid;
     grid-template-columns: 7.5rem 1fr;
@@ -185,7 +214,8 @@ const hasCv = existsSync(join(process.cwd(), 'public', cvPath));
     color: var(--color-text-faint);
   }
   .stack-items { font-size: var(--text-sm); color: var(--color-text); line-height: 1.55; margin: 0; }
-  .row-body .stack-note { font-size: var(--text-sm); color: var(--color-text-faint); }
+
+  .cv-link { display: inline-block; margin-top: 1rem; }
 
   .contact-link {
     display: inline-block;
