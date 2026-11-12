@@ -1,0 +1,136 @@
+---
+import Base from '@/layouts/Base.astro';
+import { getCollection, render } from 'astro:content';
+import { getProjects, projectSlug, projectTitle } from '@/data/projects';
+import { postSlug, keepHyphens } from '@/data/site';
+
+export async function getStaticPaths() {
+  const projects = await getProjects();
+  return projects.map(project => ({ params: { slug: projectSlug(project.id) }, props: { project } }));
+}
+
+const { project } = Astro.props;
+const { summary, stack, role, year, status, links, post } = project.data;
+const { Content } = await render(project);
+
+const posts = await getCollection('blog', ({ data }) => !data.draft);
+const writeUp = posts.find(p => postSlug(p.id) === post);
+
+// Spec sheet: only facts that are set. Nothing renders as a placeholder.
+const facts = [
+  { label: 'Role', value: role },
+  { label: 'Year', value: year },
+  { label: 'Status', value: status },
+  { label: 'Stack', value: stack.join(' · ') },
+].filter((f): f is { label: string; value: string } => Boolean(f.value));
+---
+
+<Base title={projectTitle(project.data)} description={summary}>
+  <div class="mx-auto px-6 case-wrap">
+
+    <div class="animate-fade-in case-back">
+      <a href="/projects" class="mono-link">← Projects</a>
+    </div>
+
+    <header class="case-header animate-fade-up">
+      <h1 class="case-title">{keepHyphens(projectTitle(project.data))}</h1>
+      <p class="case-summary">{summary}</p>
+
+      <dl class="case-spec">
+        {facts.map(f => (
+          <div class="spec-row">
+            <dt>{f.label}</dt>
+            <dd>{f.value}</dd>
+          </div>
+        ))}
+        {writeUp && (
+          <div class="spec-row">
+            <dt>Write-up</dt>
+            <dd><a href={`/blog/${postSlug(writeUp.id)}`} class="contact-link">{keepHyphens(writeUp.data.title)} →</a></dd>
+          </div>
+        )}
+        {links.length > 0 && (
+          <div class="spec-row">
+            <dt>Links</dt>
+            <dd class="case-links">
+              {links.map(l => <a href={l.href} class="contact-link" rel="noopener">{l.label} ↗</a>)}
+            </dd>
+          </div>
+        )}
+      </dl>
+    </header>
+
+    <article class="animate-fade-up delay-2 prose max-w-none">
+      <Content />
+    </article>
+
+  </div>
+</Base>
+
+<style>
+  /* Same reading measure as a post: ~38rem column. */
+  .case-wrap { max-width: 41rem; padding-top: 2.5rem; padding-bottom: 6rem; }
+  .case-back { margin-bottom: 1.5rem; }
+
+  .case-header {
+    border-top: 2px solid var(--color-rule);
+    padding-top: 2rem;
+    margin-bottom: 3rem;
+  }
+
+  .case-title {
+    font-size: clamp(1.75rem, 1.35rem + 1.8vw, 2.375rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1.05;
+    color: var(--color-text);
+    margin: 0 0 1rem;
+    text-wrap: balance;
+  }
+
+  .case-summary {
+    font-size: var(--text-lg);
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    margin: 0 0 2rem;
+  }
+
+  /* Spec sheet: faint mono label | value in ink, hairlines between rows,
+     2px press rule closing the header (the same grammar as the About stack). */
+  .case-spec { margin: 0; border-bottom: 2px solid var(--color-rule); }
+  .spec-row {
+    display: grid;
+    grid-template-columns: 6.5rem 1fr;
+    gap: 0.25rem 1.5rem;
+    align-items: baseline;
+    padding: 0.75rem 0;
+    border-top: 1px solid var(--color-line);
+  }
+  .spec-row dt {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+  }
+  .spec-row dd { margin: 0; font-size: var(--text-sm); color: var(--color-text); line-height: 1.55; }
+  .case-links { display: flex; flex-wrap: wrap; gap: 0.25rem 1.5rem; }
+
+  /* Inline so the row baseline is the link's first line. */
+  .contact-link {
+    padding-block: 0.25rem;
+    font-weight: 500;
+    color: var(--color-text);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.25em;
+    text-decoration-color: var(--color-text-faint);
+  }
+  .contact-link:is(:hover, :focus-visible) { text-decoration-color: var(--color-accent); }
+
+  @media (max-width: 640px) {
+    .case-wrap { padding-top: 2rem; }
+    .case-summary { font-size: var(--text-base); }
+    .spec-row { grid-template-columns: 1fr; gap: 0.2rem; }
+  }
+</style>

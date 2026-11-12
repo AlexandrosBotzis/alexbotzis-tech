@@ -60,7 +60,7 @@ Supporting threads: architecture trade-offs across frontend, backend, and AI ("E
 ## Evidence on Hand
 
 - **Writing:** one published post, "Pre-filter vs Post-filter Retrieval in RAG" (`src/content/blog/pre-filter-vs-post-filter-retrieval.md`).
-- **Projects:** only Secure AI is shown on the site (homepage Selected work and /projects, data in `src/data/site.ts`), paired with its write-up. Other projects (MediRecord, Trading Bot, Cerebrad, Trading Dashboard, OnCoNovo, Greek Invoice for WooCommerce) were deliberately removed on 2026-11-09 to keep the site on the security-and-AI positioning.
+- **Projects:** only Clearance (permission-aware RAG, formerly "Secure AI", renamed 2026-11-12) is shown on the site (homepage Selected work, /projects and its case study at /projects/clearance; data in `src/content/projects/`), paired with its write-up. Other projects (MediRecord, Trading Bot, Cerebrad, Trading Dashboard, OnCoNovo, Greek Invoice for WooCommerce) were deliberately removed on 2026-11-09 to keep the site on the security-and-AI positioning.
 - **Profiles:** LinkedIn and GitHub.
 - **Absent, do not fabricate:** quantified career metrics (team size, markets, impact numbers), testimonials, employer endorsements, readership or follower counts, the CV PDF.
 

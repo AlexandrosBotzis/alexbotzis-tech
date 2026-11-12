@@ -1,6 +1,7 @@
 ---
 import Base from './Base.astro';
-import { author, projects, formatDate, keepHyphens } from '@/data/site';
+import { author, formatDate, keepHyphens } from '@/data/site';
+import { getProjects, projectHref, projectTitle } from '@/data/projects';
 
 interface Props {
   title: string;
@@ -15,7 +16,7 @@ interface Props {
 
 const { title, description, pubDate, updatedDate, tags = [], slug, readingMinutes, next } = Astro.props;
 
-const relatedProject = projects.find(p => p.post === slug);
+const relatedProject = (await getProjects()).find(p => p.data.post === slug);
 ---
 
 <Base
@@ -57,8 +58,8 @@ const relatedProject = projects.find(p => p.post === slug);
           <div class="end-links end-links--stack">
             {next && <a href={next.href} class="end-link">{next.title} →</a>}
             {relatedProject && (
-              <a href={`/projects#${relatedProject.id}`} class="end-link">
-                Project: {relatedProject.name} →
+              <a href={projectHref(relatedProject.id)} class="end-link">
+                Case study: {projectTitle(relatedProject.data)} →
               </a>
             )}
           </div>

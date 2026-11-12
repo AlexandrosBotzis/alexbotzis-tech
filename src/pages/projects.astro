@@ -2,9 +2,11 @@
 import Base from '@/layouts/Base.astro';
 import PageHeader from '@/components/PageHeader.astro';
 import { getCollection } from 'astro:content';
-import { projects, postSlug } from '@/data/site';
+import { postSlug } from '@/data/site';
+import { getProjects, projectHref, projectSlug, projectTitle } from '@/data/projects';
 
 const posts = await getCollection('blog', ({ data }) => !data.draft);
+const projects = await getProjects();
 const postTitle = (slug?: string) => posts.find(p => postSlug(p.id) === slug)?.data.title;
 
 // Same rule as the Writing masthead: below three, a count reads as thin.
@@ -27,17 +29,21 @@ const showCount = projects.length >= 3;
 
   <div class="max-w-5xl mx-auto px-6 animate-fade-up delay-2" style="padding-bottom: 6rem;">
     {projects.map(p => {
-      const related = postTitle(p.post);
+      const related = postTitle(p.data.post);
+      const slug = projectSlug(p.id);
       return (
-        <section class="feature-project" id={p.id} aria-labelledby={`${p.id}-name`}>
+        <section class="feature-project" id={slug} aria-labelledby={`${slug}-name`}>
           <div class="feature-body">
-            <h2 class="feature-name" id={`${p.id}-name`}>{p.name}</h2>
-            <p class="feature-desc">{p.description}</p>
-            {related && (
-              <a href={`/blog/${p.post}`} class="feature-read">Read the write-up: {related} →</a>
-            )}
+            <h2 class="feature-name" id={`${slug}-name`}><a href={projectHref(p.id)}>{projectTitle(p.data)}</a></h2>
+            <p class="feature-desc">{p.data.summary}</p>
+            <div class="feature-actions">
+              <a href={projectHref(p.id)} class="mono-link">Read the case study →</a>
+              {related && (
+                <a href={`/blog/${p.data.post}`} class="feature-read">Write-up: {related} →</a>
+              )}
+            </div>
           </div>
-          <p class="feature-stack">{p.stack}</p>
+          <p class="feature-stack">{p.data.stack.join(' · ')}</p>
         </section>
       );
     })}
@@ -89,6 +95,18 @@ const showCount = projects.length >= 3;
     color: var(--color-text);
     margin: 0 0 0.875rem;
   }
+
+  /* Project names are links: ink, faint underline, red underline on hover. */
+  .feature-name a {
+    color: var(--color-text);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+    text-decoration-color: var(--color-text-faint);
+  }
+  .feature-name a:is(:hover, :focus-visible) { text-decoration-color: var(--color-accent); }
+
+  .feature-actions { display: flex; flex-direction: column; align-items: flex-start; gap: 0.5rem; }
 
   .feature-desc {
     font-size: var(--text-base);

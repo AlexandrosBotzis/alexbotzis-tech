@@ -128,7 +128,7 @@ body > main {
    global rule below; forced-colors mode falls back to plain text. */
 :root body :is(
   .nav-link, .mono-link, .footer-link, .email-link, .email-copy,
-  .contact-link, .feature-read, .end-name, .end-link, .work-name a,
+  .contact-link, .feature-read, .end-name, .end-link, .work-name a, .feature-link, .feature-name a,
   .prose a, .post-row .post-title, .post-row .post-read, .mobile-theme-state
 ) {
   --link-ink: var(--color-text);
@@ -150,7 +150,7 @@ body > main {
 
 :root body :is(
   .nav-link, .mono-link, .footer-link, .email-link, .email-copy,
-  .contact-link, .feature-read, .end-name, .end-link, .work-name a, .prose a
+  .contact-link, .feature-read, .end-name, .end-link, .work-name a, .feature-link, .feature-name a, .prose a
 ):is(:hover, :focus-visible),
 :root body .nav-link.active,
 :root body .post-row:is(:hover, :focus-visible) :is(.post-title, .post-read),
@@ -161,14 +161,14 @@ body > main {
 /* Keep selected link text legible (its fill is transparent). */
 :root body :is(
   .nav-link, .mono-link, .footer-link, .email-link, .email-copy,
-  .contact-link, .feature-read, .end-name, .end-link, .work-name a,
+  .contact-link, .feature-read, .end-name, .end-link, .work-name a, .feature-link, .feature-name a,
   .prose a, .post-row .post-title, .post-row .post-read, .mobile-theme-state
 )::selection { -webkit-text-fill-color: var(--color-bg); }
 
 @media (forced-colors: active) {
   :root body :is(
     .nav-link, .mono-link, .footer-link, .email-link, .email-copy,
-    .contact-link, .feature-read, .end-name, .end-link, .work-name a,
+    .contact-link, .feature-read, .end-name, .end-link, .work-name a, .feature-link, .feature-name a,
     .prose a, .post-row .post-title, .post-row .post-read, .mobile-theme-state
   ) {
     background: none;

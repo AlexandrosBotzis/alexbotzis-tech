@@ -43,6 +43,23 @@ typography:
     fontWeight: 700
     lineHeight: 1.08
     letterSpacing: "-0.03em"
+  case-title:
+    fontFamily: "Geist Variable, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "clamp(1.75rem, 1.35rem + 1.8vw, 2.375rem)"
+    fontWeight: 700
+    lineHeight: 1
+    letterSpacing: "-0.04em"
+  cover-headline:
+    fontFamily: "Geist Variable, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "clamp(2.75rem, 11.5vw, 5.25rem)"
+    fontWeight: 700
+    lineHeight: 0.98
+    letterSpacing: "-0.04em"
+  cover-deck:
+    fontFamily: "Geist Variable, ui-sans-serif, system-ui, sans-serif"
+    fontSize: "clamp(1.0625rem, 0.95rem + 0.6vw, 1.375rem)"
+    fontWeight: 400
+    lineHeight: 1.45
   title:
     fontFamily: "Geist Variable, ui-sans-serif, system-ui, sans-serif"
     fontSize: "clamp(1.125rem, 1rem + 0.6vw, 1.375rem)"
@@ -284,7 +301,23 @@ Labels are mono faint h2s and values are Geist. The last row has no trailing hai
 
 Contact and follow links are deliberately left out: the footer directly below carries the email, Copy, GitHub and LinkedIn. Don't repeat them here.
 
-### Signature (signature)
+### Case study (projects)
+Projects are a content collection (`src/content/projects/*.md`), one page each at `/projects/<slug>`, on the post reading measure (~38rem). Header: `← Projects`, 2px rule, the full "Name: descriptor" title in one style (same text as everywhere else on the site), muted summary, then a spec sheet (faint mono label | value in ink, hairlines, closed by a 2px rule). Optional facts (Role, Year, Status, Links) render only when set, never as placeholders. Body is prose: what it does, key decisions, what building it taught. Every project link on the site (homepage, /projects, a post's Related row) points to the case study.
+
+### Homepage section heads
+"Latest writing" and "Selected work" are real headings, not faint mono labels: Geist 700, clamp 1.75 to 2.5rem, -0.035em, ink, over a 2px press rule, with the "All writing →" link on the right of the bar. Item titles under them (feature post, project) stay smaller so the section head reads as the parent.
+
+**Rule grammar (homepage):** each rule weight has one job. 2px solid opens a section (only under a section head, plus header and footer). 1px hairline separates items within a list. Nothing closes a section: whitespace and the next section head do that. No dashed or dotted rules.
+
+**Item grammar:** both sections share link behavior (underlined ink title, red wipe and red underline on hover, mono foot action) but differ in anatomy, so the section type reads without its heading. *Writing* is a journal entry: a faint mono dateline (`29 OCT 2026 · AI`) leads, then title, description, `Read →`. The dateline is metadata, not a kicker, and is the only text allowed above an item heading. *Selected work* is a spec sheet: title, description, then hairline spec rows (faint mono label | value in ink: `Stack`, `Write-up`), the same grammar as the About stack; phones stack label over value. Every section bar carries its "All … →" link. Sections are separated by a chapter gap (clamp 4.5 to 7rem), clearly larger than any gap inside a section.
+
+### Homepage cover (signature)
+The homepage opens on a cover that fills exactly one screen under the header (`100svh`, stable when the mobile address bar collapses). The headline and deck sit at the top; the etched signature sits at the bottom, signed onto a 2px signature line with the printed name, role and place below in mono. A "More about me →" link rides the tail just past the red full stop; the signature is sized so signature plus link fit the column on phones. After a breath, "Latest writing" and "Selected work" follow. The bio lives on /about, not the homepage.
+
+- The cover headline is the largest type on the site: clamp 2.75 to 5.25rem, -0.04em, wrapping freely with balanced lines.
+- Never put more than headline, deck and signature on the cover; it must fit the first screen on a 360x740 phone.
+
+
 The homepage bio closes with a gestural, laser-etched signature for "Alex Botzis".
 
 - **Shape:** one continuous stroke. A and B stay as readable capitals, and the lowercase is compressed into rhythm (62% width, 52% height).
