@@ -11,8 +11,13 @@ const { variant = 'mono' } = Astro.props;
 
 <span class={`email email--${variant}`} data-email-contact>
   <a href={`mailto:${email}`} class="email-link">{email}</a>
-  <button type="button" class="email-copy" data-copy={email}>Copy</button>
-  <span class="email-status" role="status" aria-live="polite"></span>
+  <!-- Feedback swaps inside the button: both labels share one grid cell, so its
+       width is fixed to the longer one and nothing around it moves. -->
+  <button type="button" class="email-copy" data-copy={email}>
+    <span class="copy-label">Copy</span>
+    <span class="copy-done" aria-hidden="true">Copied</span>
+  </button>
+  <span class="email-status sr-only" role="status" aria-live="polite"></span>
 </span>
 
 <style>
@@ -64,14 +69,11 @@ const { variant = 'mono' } = Astro.props;
   }
   .email-copy:hover { color: var(--color-accent); text-decoration-color: var(--color-accent); }
 
-  .email-status {
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--color-text-muted);
-  }
-  .email-status:empty { display: none; }
+  .email-copy { display: inline-grid; justify-items: start; }
+  .copy-label, .copy-done { grid-area: 1 / 1; }
+  .copy-done { visibility: hidden; color: var(--color-text-muted); }
+  .email-copy.is-done .copy-label { visibility: hidden; }
+  .email-copy.is-done .copy-done { visibility: visible; }
 </style>
 
 <script>
@@ -82,16 +84,22 @@ const { variant = 'mono' } = Astro.props;
     if (!button || !status || !link) return;
 
     let timer: number | undefined;
-    const show = (message: string) => {
+    // Visible feedback stays inside the button (fixed width); the full message
+    // is announced to screen readers through the status region.
+    const show = (message: string, copied: boolean) => {
       status.textContent = message;
+      button.classList.toggle('is-done', copied);
       window.clearTimeout(timer);
-      timer = window.setTimeout(() => { status.textContent = ''; }, 2500);
+      timer = window.setTimeout(() => {
+        status.textContent = '';
+        button.classList.remove('is-done');
+      }, 2500);
     };
 
     button.addEventListener('click', async () => {
       try {
         await navigator.clipboard.writeText(button.dataset.copy ?? '');
-        show('Copied');
+        show('Copied', true);
       } catch {
         // Clipboard blocked (permissions, insecure context): select the address instead.
         const range = document.createRange();
@@ -99,7 +107,7 @@ const { variant = 'mono' } = Astro.props;
         const selection = window.getSelection();
         selection?.removeAllRanges();
         selection?.addRange(range);
-        show('Selected, press Ctrl/Cmd+C');
+        show('Selected, press Ctrl/Cmd+C', false);
       }
     });
   });
