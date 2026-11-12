@@ -307,6 +307,12 @@ Projects are a content collection (`src/content/projects/*.md`), one page each a
 ### Mobile body size, 404, skip link
 On phones (≤640px) `--text-base` resolves to `--text-sm` (13px), so every body text (paragraphs, descriptions, summaries, the post body) is 13px; headings, the cover deck and mono labels keep their sizes. Desktop is unchanged. A branded 404 (`src/pages/404.astro`) uses the masthead pattern with Home / Writing / Projects links. Every page starts with a "Skip to content" link, off-screen until focused. In dark mode the AB tile carries a hairline outline so its edge stays visible.
 
+### Jump line (homepage, phones)
+In the cover's empty band on phones, a broadsheet jump line marks where the story continues: faint mono "Continued below" beside a 1px hairline with a short ink segment travelling down it (2.4s loop). It links to "Latest writing", fades in after the cover settles (1.2s), and retires for good on the first scroll. Hidden above 640px. Reduced motion: static segment, no fade. Never a chevron, bouncing arrow or mouse icon.
+
+### Back to top
+`BackToTop.astro`, on every page via `Base`: a 44px press-mark tile (zero radius, 1px ink border, paper fill) with an up-arrow drawn in the AB logo's geometry (1.6 stroke, butt caps, miter joins). Fixed bottom-right (16px gutter on phones, 24px on desktop, safe-area aware). Appears after 0.9 screens of scrolling; hidden and out of the tab order near the top, so short pages never show it. At the page end it docks on the footer's 2px rule instead of covering footer links. Hover inverts the tile to ink; focus shows the red ring. Click scrolls to top (instant under reduced motion) and moves focus to `main`. No circles, shadows or floating-action-button styling.
+
 ### Page transitions
 Native cross-document view transitions (`@view-transition { navigation: auto }`), CSS only, no JS router. The masthead (`#site-header`) stays perfectly still; the page under it clears (0.13s, fade and lift 8px) and then the new page settles (0.3s, from 12px below, ease-out). Sequential, never a cross-fade. The one flourish: item titles share a `view-transition-name` (`post-<slug>`, `project-<slug>`) with the headline of the page they open, so the title glides into place. Per-page fade-ups are skipped after a transition (`.vt-nav`, set on `pagereveal`). Reduced motion turns transitions off entirely. Browsers without support (Firefox) navigate instantly. No curtains, wipes or colored overlays between pages.
 

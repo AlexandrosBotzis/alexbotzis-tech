@@ -1,0 +1,100 @@
+---
+// Back to top: a 44px press-mark tile (zero radius, 1px ink border, paper fill)
+// with an up-arrow drawn in the AB logo's geometry (butt caps, miter joins).
+// Appears after one screen of scrolling; docks on the footer's 2px rule instead
+// of covering the footer links; hidden (and out of the tab order) near the top.
+---
+
+<button type="button" class="to-top" aria-label="Back to top" data-to-top>
+  <svg viewBox="0 0 16 16" aria-hidden="true">
+    <path d="M8 13.5V3M3.5 7.5 8 3l4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="butt" stroke-linejoin="miter" />
+  </svg>
+</button>
+
+<style>
+  .to-top {
+    --gutter: 1rem;
+    position: fixed;
+    right: max(var(--gutter), env(safe-area-inset-right));
+    bottom: calc(max(var(--gutter), env(safe-area-inset-bottom)) + var(--dock, 0px));
+    z-index: 80;                       /* under the sticky header (100) and the menu (90) */
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1px solid var(--color-text);
+    border-radius: 0;
+    background: var(--color-bg);
+    color: var(--color-text);
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;                /* hidden also means out of the tab order */
+    transform: translateY(8px);
+    transition:
+      opacity 0.25s ease,
+      transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+      visibility 0s linear 0.25s,
+      background-color 0.12s ease,
+      color 0.12s ease;
+  }
+  .to-top.is-shown {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition:
+      opacity 0.25s ease,
+      transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+      visibility 0s,
+      background-color 0.12s ease,
+      color 0.12s ease;
+  }
+  .to-top svg { width: 18px; height: 18px; display: block; }
+
+  /* Hover inverts the tile to ink; red stays reserved for the at-rest marks. */
+  .to-top:hover { background: var(--color-text); color: var(--color-bg); }
+  .to-top:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
+
+  @media (min-width: 641px) {
+    .to-top { --gutter: 1.5rem; }
+  }
+
+  @media (forced-colors: active) {
+    .to-top { border-color: ButtonText; }
+  }
+</style>
+
+<script>
+  const button = document.querySelector<HTMLButtonElement>('[data-to-top]');
+  const footer = document.querySelector<HTMLElement>('.site-footer');
+
+  if (button) {
+    let ticking = false;
+
+    const update = () => {
+      ticking = false;
+      // Shown after one screen of scrolling.
+      button.classList.toggle('is-shown', window.scrollY > window.innerHeight * 0.9);
+      // Dock above the footer's 2px rule rather than covering its links.
+      const overlap = footer ? Math.max(0, window.innerHeight - footer.getBoundingClientRect().top) : 0;
+      button.style.setProperty('--dock', `${overlap}px`);
+    };
+
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(update);
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    update();
+
+    button.addEventListener('click', () => {
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+      // Keyboard and screen-reader users land at the start of the content.
+      document.getElementById('main')?.focus({ preventScroll: true });
+    });
+  }
+</script>
