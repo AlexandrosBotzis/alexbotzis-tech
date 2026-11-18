@@ -1,65 +1,187 @@
 ---
-// Analytics consent: a bottom bar under a 2px press rule. Allow and Decline carry
-// equal weight (no nudging). Rendered only when a GA ID is configured. Hidden
-// until the script finds no stored choice; the footer's "Cookies" button reopens it.
+// Analytics consent as a bookmark: an ink tab ("Cookies") pinned to the right
+// edge at 63% height (on the phone homepage that is beside the jump line, in
+// the cover's empty band).
+//
+// Three states:
+//   flag    a short flag unfolds to the tab's left: the ask in Alex's voice,
+//           Allow / Reject as identical square buttons (44px, away from the
+//           screen edge where thumbs rest) and Why. It folds back to the tab
+//           after a while (paused while hovered or focused) or once the reader
+//           scrolls on. When: on arrival, except on pages that mark a
+//           `[data-consent-moment]` (the end of a post), where the tab arrives
+//           folded and the flag unfolds when the reader reaches that moment.
+//   tab     folded: only the tab shows. Tapping it opens the panel.
+//   panel   the full explanation, Allow / Reject and the privacy link.
+// Rendered only when a GA ID is configured. Hidden until the script finds no
+// stored choice; the footer's "Cookies" button brings it back, panel open.
 import { gaId } from '@/data/site';
 ---
 
-<section class="consent" aria-label="Cookie consent" data-consent data-ga-id={gaId} tabindex="-1" hidden>
-  <div class="consent-inner max-w-5xl mx-auto px-6">
-    <p class="consent-text">
-      With your permission, this site uses Google Analytics cookies to count visits and see which posts get read. Nothing loads unless you allow it. <a href="/privacy" class="consent-link">Privacy policy</a>
-    </p>
-    <div class="consent-actions">
-      <button type="button" class="consent-btn" data-consent-choice="granted">Allow</button>
-      <button type="button" class="consent-btn" data-consent-choice="denied">Decline</button>
+<div class="bookmark" data-consent data-ga-id={gaId} hidden>
+  <div class="bm-handle">
+    <div class="bm-flag" role="region" aria-label="Analytics cookies" inert>
+      <p class="bm-flag-lead">Can I count your visit?</p>
+      <p class="bm-flag-text">
+        <span class="bm-wide">Google Analytics cookies tell me which posts to write next. No ads, no profiling.</span>
+        <span class="bm-narrow">Google Analytics, <span class="bm-keep">no ads. <button type="button" class="bm-why-inline" aria-controls="consent-panel" data-consent-why>Why?</button></span></span>
+      </p>
+      <div class="bm-choices">
+        <button type="button" class="bm-choice" data-consent-choice="granted">Allow</button>
+        <button type="button" class="bm-choice" data-consent-choice="denied">Reject</button>
+      </div>
+      <button type="button" class="bm-btn bm-btn--quiet bm-wide" aria-controls="consent-panel" data-consent-why>Why</button>
     </div>
+    <button type="button" class="bm-tab" aria-expanded="false" aria-controls="consent-panel" data-consent-tab>
+      Cookies
+    </button>
   </div>
-</section>
+  <section id="consent-panel" class="bm-panel" aria-label="Cookie consent" tabindex="-1" inert>
+    <p class="bm-text">
+      I write these posts alone. With your permission, Google Analytics cookies count visits and reads, so I know which posts to write next. No ads, no profiling, and nothing loads unless you allow it.
+    </p>
+    <div class="bm-choices">
+      <button type="button" class="bm-choice" data-consent-choice="granted">Allow</button>
+      <button type="button" class="bm-choice" data-consent-choice="denied">Reject</button>
+    </div>
+    <a href="/privacy" class="bm-btn bm-btn--quiet">Privacy policy</a>
+  </section>
+</div>
 
 <style>
-  .consent {
+  /* Folded: shifted right by the panel's width, so only the tab shows.
+     Arriving: starts fully off-screen, slides in. Open: slides to 0.
+     Reduced motion: instant, via the global rule. */
+  .bookmark {
+    --panel-w: min(80vw, 22rem);
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
     position: fixed;
-    inset: auto 0 0 0;
+    top: 63%;                          /* centred on the phone cover's jump line (~63% on 360-430px phones) */
+    right: 0;
     z-index: 85;                       /* over back-to-top (80), under menu (90) and header (100) */
-    background: var(--color-bg);
-    border-top: 2px solid var(--color-rule);
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-  .consent:focus { outline: none; }
-
-  .consent-inner {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem 2.5rem;
-    padding-block: 1rem;
+    align-items: center;               /* tab centred on the panel, so 63% is the tab's centre */
+    transform: translate(calc(var(--panel-w) + 2rem), -50%);
+    transition: transform 0.45s var(--ease-out);
+  }
+  .bookmark.is-in { transform: translate(var(--panel-w), -50%); }
+  .bookmark.is-open { transform: translate(0, -50%); }
+
+  .bm-handle { position: relative; }
+
+  /* The tab: ink, square, vertical mono label. 24px wide so it sits in the
+     phone gutter without covering text. */
+  .bm-tab {
+    position: relative;
+    z-index: 1;                        /* the flag unfolds from behind it */
+    width: 1.5rem;
+    padding: 1rem 0;
+    border: 1px solid var(--color-text);
+    border-right: 0;
+    border-radius: 0;
+    background: var(--color-text);
+    color: var(--color-bg);
+    cursor: pointer;
+    writing-mode: vertical-rl;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    line-height: 1;
+    transition: background-color 0.12s ease, color 0.12s ease;
+  }
+  /* Hover inverts, like the back-to-top tile; red stays free for the page. */
+  .bm-tab:hover,
+  .bookmark.is-open .bm-tab { background: var(--color-bg); color: var(--color-text); }
+  .bm-tab:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+  /* The flag unfolds leftward out of the tab: a clip from the tab's edge, so it
+     reads as paper pulled out of the bookmark rather than a box fading in. */
+  .bm-flag {
+    position: absolute;
+    right: 100%;
+    top: 50%;
+    width: 10.75rem;                   /* clears the jump line's label on 360px phones */
+    translate: 0 -50%;
+    padding: 0.875rem 0.75rem 0.25rem 0.875rem;
+    background: var(--color-bg);
+    border-left: 2px solid var(--color-rule);
+    border-block: 1px solid var(--color-line);
+    clip-path: inset(0 0 0 100%);
+    visibility: hidden;
+    transition: clip-path 0.4s var(--ease-out), visibility 0s linear 0.4s;
+  }
+  .bookmark.is-flag .bm-flag {
+    clip-path: inset(0);
+    visibility: visible;
+    transition: clip-path 0.55s var(--ease-out), visibility 0s;
   }
 
-  .consent-text {
+  .bm-flag-lead {
+    margin: 0 0 0.25rem;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--color-text);
+  }
+  .bm-flag-text {
     margin: 0;
-    max-width: 68ch;
+    font-size: var(--text-sm);
+    line-height: 1.45;
+    color: var(--color-text-muted);
+    text-wrap: pretty;
+  }
+
+  .bm-panel {
+    width: var(--panel-w);
+    padding: 1.25rem 1.25rem 0.375rem;
+    background: var(--color-bg);
+    border-left: 2px solid var(--color-rule);
+    border-block: 1px solid var(--color-line);
+  }
+  .bm-panel:focus { outline: none; }
+
+  .bm-text {
+    margin: 0;
     font-size: var(--text-sm);
     line-height: 1.55;
     color: var(--color-text-muted);
   }
 
-  .consent-link {
-    color: var(--color-text);
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 0.25em;
-    text-decoration-color: var(--color-text-faint);
-    transition: color 0.12s ease, text-decoration-color 0.12s ease;
+  /* The decision: two identical square buttons, side by side, equal width.
+     Same ink border, same weight, same hover; neither is nudged. Shaped like
+     the back-to-top tile: square, 1px ink, inverts to ink on hover. */
+  .bm-choices {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    margin-top: 0.875rem;
   }
-  .consent-link:hover { color: var(--color-accent); text-decoration-color: var(--color-accent); }
+  .bm-choice {
+    min-height: 2.75rem;
+    padding: 0 0.5rem;
+    border: 1px solid var(--color-text);
+    border-radius: 0;
+    background: var(--color-bg);
+    color: var(--color-text);
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: background-color 0.12s ease, color 0.12s ease;
+  }
+  .bm-choice:hover { background: var(--color-text); color: var(--color-bg); }
+  .bm-choice:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
 
-  .consent-actions { display: flex; gap: 1.75rem; flex-shrink: 0; }
-
-  .consent-btn {
+  /* Why / Privacy: disclosure, not decision, so they stay links. */
+  .bm-btn {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
     background: none;
     border: none;
-    padding: 0.5rem 0;                 /* ~32px target */
+    padding: 0;
     cursor: pointer;
     font-family: var(--font-mono);
     font-size: var(--text-xs);
@@ -72,39 +194,198 @@ import { gaId } from '@/data/site';
     text-decoration-color: var(--color-text-faint);
     transition: color 0.12s ease, text-decoration-color 0.12s ease;
   }
-  .consent-btn:hover { color: var(--color-accent); text-decoration-color: var(--color-accent); }
-  .consent-btn:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
+  .bm-btn--quiet { color: var(--color-text-muted); }
+  .bm-flag .bm-btn { margin-top: 0.25rem; }
+  .bm-panel .bm-btn { margin-top: 0.375rem; }
+  .bm-btn:hover { color: var(--color-accent); text-decoration-color: var(--color-accent); }
+  .bm-btn:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
+
+  /* Phones: a slim flag. Same ask, shorter: the lead, who gets the data and
+     an inline "Why?", then 32px buttons (above the 24px target floor). The full
+     explanation stays one tap away in the panel. */
+  .bm-narrow { display: none; }
+
+  .bm-keep { white-space: nowrap; }   /* breaks after "Google Analytics," */
+  .bm-why-inline {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    color: var(--color-text);
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+    text-decoration-color: var(--color-text-faint);
+    transition: color 0.12s ease, text-decoration-color 0.12s ease;
+  }
+  .bm-why-inline:hover { color: var(--color-accent); text-decoration-color: var(--color-accent); }
+  .bm-why-inline:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
 
   @media (max-width: 640px) {
-    .consent-inner { flex-direction: column; align-items: flex-start; }
+    .bm-wide { display: none; }
+    .bm-narrow { display: inline; }
+
+    .bm-flag { padding: 0.625rem 0.625rem 0.625rem 0.75rem; }
+    .bm-flag-lead { margin-bottom: 0.125rem; }
+    .bm-flag-text { font-size: 0.75rem; line-height: 1.4; }
+
+    .bm-choices { gap: 0.375rem; margin-top: 0.5rem; }
+    .bm-panel .bm-choices { margin-top: 0.75rem; }
+    .bm-choice { min-height: 2rem; letter-spacing: 0.08em; }
+
+    .bm-panel { padding: 1rem 1rem 0.25rem; }
+  }
+
+  @media (forced-colors: active) {
+    .bm-tab, .bm-choice { border-color: ButtonText; }
   }
 </style>
 
 <script>
-  import { loadGa, readConsent, saveConsent, stopGa, type Consent } from '@/lib/analytics';
+  import { loadGa, readConsent, saveConsent, stopGa, track, type Consent } from '@/lib/analytics';
 
-  const banner = document.querySelector<HTMLElement>('[data-consent]');
-  const id = banner?.dataset.gaId;
+  const FLAG_DELAY = 450;    // let the slide-in land before the flag unfolds
+  const FLAG_STAY = 9000;    // folds back after this, unless hovered or focused
+  const FLAG_RESUME = 4000;  // after the pointer or focus leaves the flag
+  const FLAG_SCROLL = 0.4;   // folds once the reader scrolls this many screens on...
+  const FLAG_SETTLE = 1500;  // ...counted only after it has been seen this long (a reader
+                             // reaching the end of a post is usually still scrolling)
 
-  if (banner && id) {
+  const root = document.querySelector<HTMLElement>('[data-consent]');
+  const tab = root?.querySelector<HTMLButtonElement>('[data-consent-tab]');
+  const flag = root?.querySelector<HTMLElement>('.bm-flag');
+  const panel = root?.querySelector<HTMLElement>('.bm-panel');
+  const id = root?.dataset.gaId;
+
+  if (root && tab && flag && panel && id) {
+    // Where the reader chose from, reported with consent_granted. Only an Allow
+    // can be measured: before consent nothing may be sent to Google.
+    let openedFrom = 'tab';
+
+    const show = () => {
+      if (!root.hidden) return;
+      root.hidden = false;
+      root.getBoundingClientRect();    // commit the off-screen start so the slide-in runs
+      root.classList.add('is-in');
+    };
+
+    // ── Flag ──
+    let foldTimer: number | undefined;
+    let settleTimer: number | undefined;
+    let held = false;                  // pointer over or focus inside the flag
+    let scrollStart = 0;
+
+    const fold = () => {
+      window.clearTimeout(foldTimer);
+      window.clearTimeout(settleTimer);
+      window.removeEventListener('scroll', onScroll);
+      root.classList.remove('is-flag');
+      flag.inert = true;
+    };
+    const armFold = (ms: number) => {
+      window.clearTimeout(foldTimer);
+      if (!held) foldTimer = window.setTimeout(fold, ms);
+    };
+    function onScroll() {
+      if (Math.abs(window.scrollY - scrollStart) > window.innerHeight * FLAG_SCROLL) fold();
+    }
+    const unfold = () => {
+      root.classList.add('is-flag');
+      flag.inert = false;
+      armFold(FLAG_STAY);
+      settleTimer = window.setTimeout(() => {
+        scrollStart = window.scrollY;
+        window.addEventListener('scroll', onScroll, { passive: true });
+      }, FLAG_SETTLE);
+    };
+
+    const hold = () => { held = true; window.clearTimeout(foldTimer); };
+    const release = () => { held = false; if (root.classList.contains('is-flag')) armFold(FLAG_RESUME); };
+    flag.addEventListener('pointerenter', hold);
+    flag.addEventListener('pointerleave', release);
+    flag.addEventListener('focusin', hold);
+    flag.addEventListener('focusout', (e) => { if (!flag.contains(e.relatedTarget as Node)) release(); });
+
+    // ── Panel ──
+    const setOpen = (open: boolean, focus = true) => {
+      if (open) fold();
+      root.classList.toggle('is-open', open);
+      tab.setAttribute('aria-expanded', String(open));
+      panel.inert = !open;
+      if (!focus) return;
+      if (open) panel.focus({ preventScroll: true });
+      else tab.focus({ preventScroll: true });
+    };
+
+    // On a post, ask once the reader reaches the end (they just got the value);
+    // the tab arrives folded. Everywhere else the flag unfolds on arrival.
+    const unfoldAtMoment = () => {
+      const moment = document.querySelector<HTMLElement>('[data-consent-moment]');
+      if (!moment || !('IntersectionObserver' in window)) return window.setTimeout(unfold, FLAG_DELAY);
+      const io = new IntersectionObserver((entries) => {
+        if (!entries.some(e => e.isIntersecting)) return;
+        io.disconnect();
+        if (!root.hidden && !root.classList.contains('is-open')) unfold();
+      });
+      io.observe(moment);
+    };
+
     const consent = readConsent();
     if (consent === 'granted') loadGa(id);
-    else if (consent === null) banner.hidden = false;
+    else if (consent === null) { show(); unfoldAtMoment(); }
 
-    banner.querySelectorAll<HTMLButtonElement>('[data-consent-choice]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const choice = btn.dataset.consentChoice as Consent;
-        saveConsent(choice);
-        if (choice === 'granted') loadGa(id);
-        else stopGa(id);
-        banner.hidden = true;
+    tab.addEventListener('click', () => {
+      const open = !root.classList.contains('is-open');
+      if (open) openedFrom = 'tab';
+      setOpen(open);
+    });
+
+    root.querySelectorAll<HTMLButtonElement>('[data-consent-why]').forEach((why) => {
+      why.addEventListener('click', () => {
+        openedFrom = 'why';
+        setOpen(true);
       });
     });
 
-    document.querySelectorAll<HTMLButtonElement>('[data-consent-open]').forEach((btn) => {
+    // Document-level: the flag is non-modal, so Escape folds it wherever focus is.
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape' || root.hidden) return;
+      if (root.classList.contains('is-open')) setOpen(false);
+      else if (root.classList.contains('is-flag')) { fold(); tab.focus({ preventScroll: true }); }
+    });
+
+    // A tap outside folds the panel back to the tab (no choice made). The flag
+    // ignores outside taps: on phones every scroll starts with one.
+    document.addEventListener('pointerdown', (e) => {
+      if (root.classList.contains('is-open') && !root.contains(e.target as Node)) setOpen(false, false);
+    });
+
+    root.querySelectorAll<HTMLButtonElement>('[data-consent-choice]').forEach((btn) => {
       btn.addEventListener('click', () => {
-        banner.hidden = false;
-        banner.focus();
+        const choice = btn.dataset.consentChoice as Consent;
+        saveConsent(choice);
+        if (choice === 'granted') {
+          loadGa(id);
+          // GA adds the page itself.
+          track('consent_granted', { source: flag.contains(btn) ? 'flag' : openedFrom });
+        } else {
+          stopGa(id);
+        }
+        fold();
+        setOpen(false, false);
+        root.classList.remove('is-in');
+        root.hidden = true;
+      });
+    });
+
+    // Footer and privacy-page "Cookies": bring the bookmark back, panel open.
+    document.querySelectorAll<HTMLButtonElement>('[data-consent-open]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openedFrom = btn.dataset.consentOpen || 'link';
+        show();
+        requestAnimationFrame(() => setOpen(true));
       });
     });
   }

@@ -1,5 +1,8 @@
 // GA4 behind consent. Nothing from Google loads until the visitor allows it
-// (see src/components/ConsentBanner.astro); until then `track` is a no-op.
+// (see src/components/ConsentBanner.astro). Until then `track` holds this
+// page's events in memory: sent if the visitor allows on this page (a reader
+// asked at the end of a post still counts as having read it), dropped on
+// reject or when they leave. Nothing is stored or sent before consent.
 
 declare global {
   interface Window {
@@ -10,6 +13,10 @@ declare global {
 
 const CONSENT_KEY = 'analytics-consent';
 export type Consent = 'granted' | 'denied';
+
+type Params = Record<string, string | number>;
+/** This page's events from before a choice; see the header comment. */
+const pending: [string, Params | undefined][] = [];
 
 export function readConsent(): Consent | null {
   try {
@@ -34,6 +41,7 @@ export function loadGa(id: string) {
   window.gtag = function () { window.dataLayer!.push(arguments); };
   window.gtag('js', new Date());
   window.gtag('config', id);
+  for (const [event, params] of pending.splice(0)) window.gtag('event', event, params);
   const s = document.createElement('script');
   s.async = true;
   s.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(id)}`;
@@ -42,6 +50,7 @@ export function loadGa(id: string) {
 
 /** Withdrawal: stop GA on this page and remove its cookies (_ga, _ga_<id>). */
 export function stopGa(id: string) {
+  pending.length = 0;
   (window as unknown as Record<string, unknown>)[`ga-disable-${id}`] = true;
   const host = location.hostname;
   const domains = ['', host, `.${host}`, `.${host.split('.').slice(-2).join('.')}`];
@@ -53,6 +62,7 @@ export function stopGa(id: string) {
   }
 }
 
-export function track(event: string, params?: Record<string, string | number>) {
-  window.gtag?.('event', event, params);
+export function track(event: string, params?: Params) {
+  if (window.gtag) window.gtag('event', event, params);
+  else if (readConsent() === null) pending.push([event, params]);  // undecided: hold until a choice
 }

@@ -40,7 +40,7 @@ Supporting threads: architecture trade-offs across frontend, backend, and AI ("E
 
 - Pages: Home, About, Projects, Writing (blog index), post pages, Privacy, sitemap.
 - No backend, no comments, no newsletter.
-- Analytics: GA4, loaded only after cookie consent (`src/lib/analytics.ts`, `ConsentBanner.astro`). Custom events: `post_read`, `email_copy`, `email_click`; LinkedIn/GitHub clicks and CV downloads come from GA4 enhanced measurement.
+- Analytics: GA4, loaded only after cookie consent (`src/lib/analytics.ts`, `ConsentBanner.astro`). Custom events: `post_read`, `email_copy`, `email_click`, `consent_granted` (source: flag / tab / why / footer / privacy_page); LinkedIn/GitHub clicks and CV downloads come from GA4 enhanced measurement.
 - Language: English.
 - Contact via `hello@alexbotzis.tech` (copy-to-clipboard) and LinkedIn/GitHub.
 - CV download section on About renders only when `public/alex-botzis-cv.pdf` exists.

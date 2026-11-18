@@ -42,7 +42,7 @@ const profiles = [
       <span class="footer-copy">
         &copy; {year} {author.name}
         <a href="/privacy" class="footer-minor">Privacy</a>
-        {gaId && <button type="button" class="footer-minor" data-consent-open>Cookies</button>}
+        {gaId && <button type="button" class="footer-minor" data-consent-open="footer">Cookies</button>}
       </span>
       <div class="footer-profiles">
         {profiles.map(({ href, label }) => (

@@ -46,7 +46,7 @@ const relatedProject = (await getProjects()).find(p => p.data.post === slug);
       <slot />
     </article>
 
-    <aside class="end-matter" aria-label="About the author and what to read next" data-post={slug}>
+    <aside class="end-matter" aria-label="About the author and what to read next" data-post={slug} data-consent-moment>
       <div class="end-row">
         <h2 class="end-label">Written by</h2>
         <p class="end-bio"><a href="/about" class="end-name">{author.name}</a>. {author.bio}</p>
