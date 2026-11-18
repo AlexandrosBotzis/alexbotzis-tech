@@ -1,8 +1,10 @@
 ---
 // The colophon: two rows under the page's closing press rule.
-//   Row 1: signature mark (home) · site links · email + Copy
-//   Row 2 (after a hairline): copyright · profiles
-// On phones row 1 wraps into signature + email, then the links; row 2 stays one line.
+//   Row 1: © year + signature mark (home) · site links · email + Copy
+//   Row 2 (after a hairline): Privacy (+ Cookies) · profiles
+// The name appears once, as the signature; the copyright line borrows it
+// (screen readers still hear "© 2026 Alex Botzis").
+// On phones row 1 stacks: year + signature, email, links; row 2 stays one line.
 import EmailContact from '@/components/EmailContact.astro';
 import Signature from '@/components/Signature.astro';
 import { author, gaId, social } from '@/data/site';
@@ -25,9 +27,12 @@ const profiles = [
   <div class="max-w-5xl mx-auto px-6">
 
     <div class="footer-main">
-      <a href="/" class="footer-mark" aria-label={`${author.name}, home`}>
-        <Signature animated={false} />
-      </a>
+      <div class="footer-sign">
+        <span class="footer-copy">&copy; {year}<span class="sr-only"> {author.name}</span></span>
+        <a href="/" class="footer-mark" aria-label={`${author.name}, home`}>
+          <Signature animated={false} />
+        </a>
+      </div>
       <nav class="footer-nav" aria-label="Footer">
         {nav.map(({ href, label }) => (
           <a href={href} class="footer-link">{label}</a>
@@ -39,11 +44,10 @@ const profiles = [
     </div>
 
     <div class="footer-base">
-      <span class="footer-copy">
-        &copy; {year} {author.name}
+      <div class="footer-legal">
         <a href="/privacy" class="footer-minor">Privacy</a>
         {gaId && <button type="button" class="footer-minor" data-consent-open="footer">Cookies</button>}
-      </span>
+      </div>
       <div class="footer-profiles">
         {profiles.map(({ href, label }) => (
           <a href={href} class="footer-link" target="_blank" rel="noopener noreferrer">{label} <span aria-hidden="true">↗</span></a>
@@ -67,6 +71,12 @@ const profiles = [
     gap: 0.5rem 2.5rem;
     padding: 1.25rem 0;
     border-bottom: 1px solid var(--color-line);
+  }
+
+  .footer-sign {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
   }
 
   .footer-mark {
@@ -98,7 +108,7 @@ const profiles = [
   }
   .footer-link:hover { color: var(--color-accent); }
 
-  /* Row 2: copyright and profiles on one line, everywhere. */
+  /* Row 2: Privacy (+ Cookies) and profiles on one line, everywhere. */
   .footer-base {
     display: flex;
     align-items: center;
@@ -108,19 +118,21 @@ const profiles = [
     padding: 0.5rem 0;
   }
 
-  .footer-copy {
+  .footer-copy,
+  .footer-legal {
     font-family: var(--font-mono);
     font-size: var(--text-xs);
     letter-spacing: 0.05em;
     color: var(--color-text-faint);
   }
+  .footer-copy { white-space: nowrap; }
+  .footer-legal { display: flex; gap: 1.25rem; }
 
-  /* Privacy link and Cookies button: quiet, beside the copyright.
+  /* Privacy link and Cookies button: quiet, faint mono.
      Hover is the shared red wipe (global.css), from faint ink. */
   .footer-minor {
     background-color: transparent;
     border: none;
-    margin-left: 1.25rem;
     padding: 0.375rem 0;
     cursor: pointer;
     font: inherit;
@@ -132,23 +144,16 @@ const profiles = [
   }
 
   @media (max-width: 640px) {
-    /* Row 1 becomes: signature + email, then the links. */
+    /* Row 1 stacks: © year + signature, then email, then the links. (With the
+       year beside it, the signature no longer leaves room for the email.) */
     .footer-main {
-      grid-template-columns: auto 1fr;
-      grid-template-areas:
-        "mark email"
-        "nav  nav";
+      grid-template-columns: 1fr;
+      grid-template-areas: "mark" "email" "nav";
       gap: 0.25rem 1rem;
       padding: 1rem 0 0.75rem;
     }
-    .footer-mark { grid-area: mark; }
-    .footer-email { grid-area: email; justify-self: end; }
+    .footer-sign { grid-area: mark; }
+    .footer-email { grid-area: email; }
     .footer-nav { grid-area: nav; justify-content: flex-start; gap: 0 1.5rem; }
-  }
-
-  @media (max-width: 400px) {
-    /* Too narrow for mark and email side by side: stack them, still compact. */
-    .footer-main { grid-template-columns: 1fr; grid-template-areas: "mark" "email" "nav"; }
-    .footer-email { justify-self: start; }
   }
 </style>

@@ -365,8 +365,8 @@ The homepage bio closes with a gestural, laser-etched signature for "Alex Botzis
 - At switch-off, the trail cools into the end point, which becomes the full stop.
 
 **Footer (colophon).** Two rows under a 2px press rule:
-1. Signature mark (linking home), site links and email with Copy. On phones this row wraps: signature and email first, then the links.
-2. After a hairline: copyright and profiles, always on one line.
+1. "© year" in faint mono beside the signature mark (linking home), site links, and email with Copy. The name appears once, as the signature; the copyright borrows it (screen readers hear "© 2026 Alex Botzis"). On phones this row stacks: year and signature, then email, then the links.
+2. After a hairline: Privacy (and Cookies, when analytics is on) in faint mono, and profiles, always on one line.
 
 Links are mono labels with about 30px targets, above the 24px WCAG floor and spaced apart. Keep the footer about 125px on desktop and under 180px on mobile. It's a colophon, not a section.
 
