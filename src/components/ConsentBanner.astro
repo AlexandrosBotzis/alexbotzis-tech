@@ -5,10 +5,10 @@
 //
 // Three states:
 //   flag    a short flag unfolds to the tab's left: the ask in Alex's voice,
-//           Allow / Reject as identical square buttons (44px, away from the
-//           screen edge where thumbs rest) and Why. It folds back to the tab
-//           after a while (paused while hovered or focused) or once the reader
-//           scrolls on. When: on arrival, except on pages that mark a
+//           Allow / Reject as identical square buttons (away from the screen
+//           edge where thumbs rest) and Why. It stays open through scrolling
+//           until a choice; tapping the tab or Escape tucks it away.
+//           When: on arrival, except on pages that mark a
 //           `[data-consent-moment]` (the end of a post), where the tab arrives
 //           folded and the flag unfolds when the reader reaches that moment.
 //   tab     folded: only the tab shows. Tapping it opens the panel.
@@ -96,17 +96,22 @@ import { gaId } from '@/data/site';
   .bm-tab:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
 
   /* The flag unfolds leftward out of the tab: a clip from the tab's edge, so it
-     reads as paper pulled out of the bookmark rather than a box fading in. */
+     reads as paper pulled out of the bookmark rather than a box fading in.
+     Framed like the site's structural boundaries: 2px press rules on its top
+     and left edge (where the page's masthead and headers carry them), a
+     hairline below. Where the two rules meet, the brand's red square is
+     stamped in once the flag has unfolded (see ::before). */
   .bm-flag {
     position: absolute;
     right: 100%;
     top: 50%;
-    width: 10.75rem;                   /* clears the jump line's label on 360px phones */
+    width: 13.5rem;                    /* phones narrow it to 10.75rem (below) */
     translate: 0 -50%;
     padding: 0.875rem 0.75rem 0.25rem 0.875rem;
     background: var(--color-bg);
+    border-top: 2px solid var(--color-rule);
     border-left: 2px solid var(--color-rule);
-    border-block: 1px solid var(--color-line);
+    border-bottom: 1px solid var(--color-line);
     clip-path: inset(0 0 0 100%);
     visibility: hidden;
     transition: clip-path 0.4s var(--ease-out), visibility 0s linear 0.4s;
@@ -117,11 +122,36 @@ import { gaId } from '@/data/site';
     transition: clip-path 0.55s var(--ease-out), visibility 0s;
   }
 
+  /* The stamp: the AB mark's red square, capping the corner where the press
+     rules meet. A brand mark, like the signature's red full stop, so it does
+     not count toward a page's two red marks. It lands after the unfold with
+     the full stop's scale-in: the one moment that draws the eye. */
+  .bm-flag::before {
+    content: "";
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    width: 0.5rem;
+    height: 0.5rem;
+    background: var(--color-accent);
+    opacity: 0;
+    transform: scale(0.4);
+    transform-origin: top left;
+    transition: opacity 0.15s ease, transform 0.3s var(--ease-out);
+  }
+  .bookmark.is-flag .bm-flag::before {
+    opacity: 1;
+    transform: none;
+    transition-delay: 0.45s;
+  }
+
+  /* The question in the headline voice (Geist 700, tight tracking). */
   .bm-flag-lead {
-    margin: 0 0 0.25rem;
-    font-size: var(--text-sm);
-    font-weight: 600;
-    line-height: 1.35;
+    margin: 0 0 0.375rem;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
     color: var(--color-text);
   }
   .bm-flag-text {
@@ -226,8 +256,8 @@ import { gaId } from '@/data/site';
     .bm-wide { display: none; }
     .bm-narrow { display: inline; }
 
-    .bm-flag { padding: 0.625rem 0.625rem 0.625rem 0.75rem; }
-    .bm-flag-lead { margin-bottom: 0.125rem; }
+    .bm-flag { width: 10.75rem; padding: 0.625rem 0.625rem 0.625rem 0.75rem; }  /* clears the jump line's label on 360px phones */
+    .bm-flag-lead { margin-bottom: 0.25rem; font-size: 0.875rem; }
     .bm-flag-text { font-size: 0.75rem; line-height: 1.4; }
 
     .bm-choices { gap: 0.375rem; margin-top: 0.5rem; }
@@ -246,11 +276,6 @@ import { gaId } from '@/data/site';
   import { loadGa, readConsent, saveConsent, stopGa, track, type Consent } from '@/lib/analytics';
 
   const FLAG_DELAY = 450;    // let the slide-in land before the flag unfolds
-  const FLAG_STAY = 9000;    // folds back after this, unless hovered or focused
-  const FLAG_RESUME = 4000;  // after the pointer or focus leaves the flag
-  const FLAG_SCROLL = 0.4;   // folds once the reader scrolls this many screens on...
-  const FLAG_SETTLE = 1500;  // ...counted only after it has been seen this long (a reader
-                             // reaching the end of a post is usually still scrolling)
 
   const root = document.querySelector<HTMLElement>('[data-consent]');
   const tab = root?.querySelector<HTMLButtonElement>('[data-consent-tab]');
@@ -271,41 +296,17 @@ import { gaId } from '@/data/site';
     };
 
     // ── Flag ──
-    let foldTimer: number | undefined;
-    let settleTimer: number | undefined;
-    let held = false;                  // pointer over or focus inside the flag
-    let scrollStart = 0;
-
+    // Stays open, through scrolling, until the reader chooses. A user test
+    // showed a self-folding flag goes unnoticed. Tapping the tab or Escape
+    // tucks it away without a choice.
     const fold = () => {
-      window.clearTimeout(foldTimer);
-      window.clearTimeout(settleTimer);
-      window.removeEventListener('scroll', onScroll);
       root.classList.remove('is-flag');
       flag.inert = true;
     };
-    const armFold = (ms: number) => {
-      window.clearTimeout(foldTimer);
-      if (!held) foldTimer = window.setTimeout(fold, ms);
-    };
-    function onScroll() {
-      if (Math.abs(window.scrollY - scrollStart) > window.innerHeight * FLAG_SCROLL) fold();
-    }
     const unfold = () => {
       root.classList.add('is-flag');
       flag.inert = false;
-      armFold(FLAG_STAY);
-      settleTimer = window.setTimeout(() => {
-        scrollStart = window.scrollY;
-        window.addEventListener('scroll', onScroll, { passive: true });
-      }, FLAG_SETTLE);
     };
-
-    const hold = () => { held = true; window.clearTimeout(foldTimer); };
-    const release = () => { held = false; if (root.classList.contains('is-flag')) armFold(FLAG_RESUME); };
-    flag.addEventListener('pointerenter', hold);
-    flag.addEventListener('pointerleave', release);
-    flag.addEventListener('focusin', hold);
-    flag.addEventListener('focusout', (e) => { if (!flag.contains(e.relatedTarget as Node)) release(); });
 
     // ── Panel ──
     const setOpen = (open: boolean, focus = true) => {
@@ -335,7 +336,9 @@ import { gaId } from '@/data/site';
     if (consent === 'granted') loadGa(id);
     else if (consent === null) { show(); unfoldAtMoment(); }
 
+    // Tab: with the flag out, tucks it away; folded, toggles the panel.
     tab.addEventListener('click', () => {
+      if (root.classList.contains('is-flag')) return fold();
       const open = !root.classList.contains('is-open');
       if (open) openedFrom = 'tab';
       setOpen(open);
