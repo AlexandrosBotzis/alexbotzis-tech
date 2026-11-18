@@ -1,0 +1,111 @@
+---
+// Analytics consent: a bottom bar under a 2px press rule. Allow and Decline carry
+// equal weight (no nudging). Rendered only when a GA ID is configured. Hidden
+// until the script finds no stored choice; the footer's "Cookies" button reopens it.
+import { gaId } from '@/data/site';
+---
+
+<section class="consent" aria-label="Cookie consent" data-consent data-ga-id={gaId} tabindex="-1" hidden>
+  <div class="consent-inner max-w-5xl mx-auto px-6">
+    <p class="consent-text">
+      With your permission, this site uses Google Analytics cookies to count visits and see which posts get read. Nothing loads unless you allow it. <a href="/privacy" class="consent-link">Privacy policy</a>
+    </p>
+    <div class="consent-actions">
+      <button type="button" class="consent-btn" data-consent-choice="granted">Allow</button>
+      <button type="button" class="consent-btn" data-consent-choice="denied">Decline</button>
+    </div>
+  </div>
+</section>
+
+<style>
+  .consent {
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: 85;                       /* over back-to-top (80), under menu (90) and header (100) */
+    background: var(--color-bg);
+    border-top: 2px solid var(--color-rule);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .consent:focus { outline: none; }
+
+  .consent-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 2.5rem;
+    padding-block: 1rem;
+  }
+
+  .consent-text {
+    margin: 0;
+    max-width: 68ch;
+    font-size: var(--text-sm);
+    line-height: 1.55;
+    color: var(--color-text-muted);
+  }
+
+  .consent-link {
+    color: var(--color-text);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.25em;
+    text-decoration-color: var(--color-text-faint);
+    transition: color 0.12s ease, text-decoration-color 0.12s ease;
+  }
+  .consent-link:hover { color: var(--color-accent); text-decoration-color: var(--color-accent); }
+
+  .consent-actions { display: flex; gap: 1.75rem; flex-shrink: 0; }
+
+  .consent-btn {
+    background: none;
+    border: none;
+    padding: 0.5rem 0;                 /* ~32px target */
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.25em;
+    text-decoration-color: var(--color-text-faint);
+    transition: color 0.12s ease, text-decoration-color 0.12s ease;
+  }
+  .consent-btn:hover { color: var(--color-accent); text-decoration-color: var(--color-accent); }
+  .consent-btn:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
+
+  @media (max-width: 640px) {
+    .consent-inner { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+
+<script>
+  import { loadGa, readConsent, saveConsent, stopGa, type Consent } from '@/lib/analytics';
+
+  const banner = document.querySelector<HTMLElement>('[data-consent]');
+  const id = banner?.dataset.gaId;
+
+  if (banner && id) {
+    const consent = readConsent();
+    if (consent === 'granted') loadGa(id);
+    else if (consent === null) banner.hidden = false;
+
+    banner.querySelectorAll<HTMLButtonElement>('[data-consent-choice]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const choice = btn.dataset.consentChoice as Consent;
+        saveConsent(choice);
+        if (choice === 'granted') loadGa(id);
+        else stopGa(id);
+        banner.hidden = true;
+      });
+    });
+
+    document.querySelectorAll<HTMLButtonElement>('[data-consent-open]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        banner.hidden = false;
+        banner.focus();
+      });
+    });
+  }
+</script>

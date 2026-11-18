@@ -5,7 +5,7 @@
 // On phones row 1 wraps into signature + email, then the links; row 2 stays one line.
 import EmailContact from '@/components/EmailContact.astro';
 import Signature from '@/components/Signature.astro';
-import { author, social } from '@/data/site';
+import { author, gaId, social } from '@/data/site';
 
 const year = new Date().getFullYear();
 
@@ -39,7 +39,11 @@ const profiles = [
     </div>
 
     <div class="footer-base">
-      <span class="footer-copy">&copy; {year} {author.name}</span>
+      <span class="footer-copy">
+        &copy; {year} {author.name}
+        <a href="/privacy" class="footer-minor">Privacy</a>
+        {gaId && <button type="button" class="footer-minor" data-consent-open>Cookies</button>}
+      </span>
       <div class="footer-profiles">
         {profiles.map(({ href, label }) => (
           <a href={href} class="footer-link" target="_blank" rel="noopener noreferrer">{label} <span aria-hidden="true">↗</span></a>
@@ -109,6 +113,22 @@ const profiles = [
     font-size: var(--text-xs);
     letter-spacing: 0.05em;
     color: var(--color-text-faint);
+  }
+
+  /* Privacy link and Cookies button: quiet, beside the copyright.
+     Hover is the shared red wipe (global.css), from faint ink. */
+  .footer-minor {
+    background-color: transparent;
+    border: none;
+    margin-left: 1.25rem;
+    padding: 0.375rem 0;
+    cursor: pointer;
+    font: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.25em;
   }
 
   @media (max-width: 640px) {

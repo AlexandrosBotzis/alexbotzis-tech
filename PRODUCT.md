@@ -38,8 +38,9 @@ Supporting threads: architecture trade-offs across frontend, backend, and AI ("E
 
 ## Capabilities and Constraints
 
-- Pages: Home, About, Projects, Writing (blog index), post pages, sitemap.
-- No backend, no comments, no newsletter, no analytics yet.
+- Pages: Home, About, Projects, Writing (blog index), post pages, Privacy, sitemap.
+- No backend, no comments, no newsletter.
+- Analytics: GA4, loaded only after cookie consent (`src/lib/analytics.ts`, `ConsentBanner.astro`). Custom events: `post_read`, `email_copy`, `email_click`; LinkedIn/GitHub clicks and CV downloads come from GA4 enhanced measurement.
 - Language: English.
 - Contact via `hello@alexbotzis.tech` (copy-to-clipboard) and LinkedIn/GitHub.
 - CV download section on About renders only when `public/alex-botzis-cv.pdf` exists.
@@ -49,7 +50,7 @@ Supporting threads: architecture trade-offs across frontend, backend, and AI ("E
 ## Brand Commitments
 
 - **Name and domain:** Alex Botzis, alexbotzis.tech.
-- **Title:** Senior Full-Stack Engineer (decided 2026-11-09; used everywhere).
+- **Title:** Senior FullStack Engineer (decided 2026-11-09; used everywhere).
 - **Experience:** stated as "since 2017", never as a year count (decided 2026-11-10).
 - **Mark:** the AB tile: a parted monoline A and B with a red square capping the A's crossbar (inlined in `src/components/Nav.astro`, favicon `public/ab-favicon-16.svg`). The earlier pixel-grid AB was retired on 2026-11-10.
 - **Tagline:** "Engineering decisions that aren't obvious."

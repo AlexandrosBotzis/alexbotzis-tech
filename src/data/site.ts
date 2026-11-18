@@ -8,6 +8,10 @@ export const author = {
 
 export const email = 'hello@alexbotzis.tech';
 
+/** GA4 measurement ID. Set PUBLIC_GA_ID for the Vercel Production environment only;
+ *  when unset (dev, previews), no analytics or consent banner is rendered. */
+export const gaId: string | undefined = import.meta.env.PROD ? import.meta.env.PUBLIC_GA_ID || undefined : undefined;
+
 export const social = {
   github: 'https://github.com/AlexandrosBotzis',
   linkedin: 'https://linkedin.com/in/AlexandrosBotzis',

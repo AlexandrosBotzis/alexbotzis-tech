@@ -46,7 +46,7 @@ const relatedProject = (await getProjects()).find(p => p.data.post === slug);
       <slot />
     </article>
 
-    <aside class="end-matter" aria-label="About the author and what to read next">
+    <aside class="end-matter" aria-label="About the author and what to read next" data-post={slug}>
       <div class="end-row">
         <h2 class="end-label">Written by</h2>
         <p class="end-bio"><a href="/about" class="end-name">{author.name}</a>. {author.bio}</p>
@@ -69,6 +69,21 @@ const relatedProject = (await getProjects()).find(p => p.data.post === slug);
 
   </div>
 </Base>
+
+<script>
+  import { track } from '@/lib/analytics';
+
+  // "Read a full post" (success #1 in PRODUCT.md): the reader reached the end matter.
+  const end = document.querySelector<HTMLElement>('.end-matter');
+  if (end && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      if (!entries.some(e => e.isIntersecting)) return;
+      track('post_read', { post: end.dataset.post ?? '' });
+      io.disconnect();
+    });
+    io.observe(end);
+  }
+</script>
 
 <style>
   /* Reading measure: ~41rem wrap gives a 38rem (~75 character) column. */

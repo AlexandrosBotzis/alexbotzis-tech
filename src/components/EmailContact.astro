@@ -77,6 +77,8 @@ const { variant = 'mono' } = Astro.props;
 </style>
 
 <script>
+  import { track } from '@/lib/analytics';
+
   document.querySelectorAll<HTMLElement>('[data-email-contact]').forEach((root) => {
     const button = root.querySelector<HTMLButtonElement>('.email-copy');
     const status = root.querySelector<HTMLElement>('.email-status');
@@ -96,7 +98,10 @@ const { variant = 'mono' } = Astro.props;
       }, 2500);
     };
 
+    link.addEventListener('click', () => track('email_click'));
+
     button.addEventListener('click', async () => {
+      track('email_copy');
       try {
         await navigator.clipboard.writeText(button.dataset.copy ?? '');
         show('Copied', true);

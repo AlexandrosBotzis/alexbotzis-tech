@@ -1,0 +1,88 @@
+---
+import Base from '@/layouts/Base.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import { author, email, formatDate, gaId } from '@/data/site';
+
+// Bump when the policy text changes.
+const updated = new Date('2026-11-18');
+---
+
+<Base title="Privacy" description="What this site collects, why, and how to opt out.">
+
+  <div class="animate-fade-up">
+    <PageHeader title="Privacy">
+      <p class="intro">No tracking without your permission.<br/>No ads, no data sold.</p>
+    </PageHeader>
+  </div>
+
+  <div class="mx-auto px-6 privacy-wrap">
+    <article class="animate-fade-up delay-2 prose max-w-none">
+      <p class="updated">Last updated {formatDate(updated, 'long')}</p>
+
+      <h2>Who is responsible</h2>
+      <p>This site is run by {author.name}, based in Greece, who is the data controller for it. For anything about your data, email <a href={`mailto:${email}`}>{email}</a>.</p>
+
+      <h2>Analytics, only if you allow it</h2>
+      <p>With your consent, the site uses Google Analytics 4 to understand how it is read: which pages are visited, where visitors come from (for example LinkedIn or a search engine), approximate location at country and city level, device and browser type, and a few actions: reaching the end of a post, copying or clicking the email address, opening LinkedIn or GitHub, and downloading the CV.</p>
+      <p>Google Analytics sets cookies (<code>_ga</code> and <code>_ga_*</code>) to tell visits apart. It does not tell me who you are, and I do not combine it with other data. Google Analytics 4 does not log or store IP addresses.</p>
+      <ul>
+        <li><strong>Legal basis:</strong> your consent (GDPR Art. 6(1)(a)). Until you choose Allow, no Google script loads and no cookie is set.</li>
+        <li><strong>Retention:</strong> analytics data is kept for 2 months, then deleted by Google.</li>
+        <li><strong>Transfers:</strong> Google may process data in the United States under the EU-US Data Privacy Framework.</li>
+        <li><strong>Changing your mind:</strong> use the {gaId ? <button type="button" class="inline-btn" data-consent-open>Cookies</button> : 'Cookies'} setting (also in the footer). Declining stops analytics and deletes its cookies.</li>
+      </ul>
+
+      <h2>Hosting</h2>
+      <p>The site is hosted on Vercel. Like any web server, it briefly processes your IP address and request details to deliver pages and protect against abuse. This is necessary to run the site (legitimate interest, GDPR Art. 6(1)(f)). Vercel may process data in the United States under the EU-US Data Privacy Framework.</p>
+
+      <h2>Stored on your device</h2>
+      <p>The site keeps two settings in your browser's local storage: your light or dark theme, and your analytics choice. They never leave your device. Fonts are served from this site, not from Google Fonts.</p>
+
+      <h2>Email</h2>
+      <p>If you email me, I use your message and address only to reply, and keep them for as long as the conversation is relevant.</p>
+
+      <h2>Your rights</h2>
+      <p>Under the GDPR you can ask to access, correct, or delete your data, restrict or object to its processing, and withdraw consent at any time. Email <a href={`mailto:${email}`}>{email}</a>. You can also complain to the Hellenic Data Protection Authority (<a href="https://www.dpa.gr" rel="noopener noreferrer">dpa.gr</a>) or the authority where you live.</p>
+    </article>
+  </div>
+
+</Base>
+
+<style>
+  .privacy-wrap { max-width: 41rem; padding-top: 3rem; padding-bottom: 6rem; }
+
+  .intro {
+    margin: 0;
+    font-size: var(--text-base);
+    line-height: 1.6;
+    color: var(--color-text-muted);
+  }
+
+  .updated {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-faint);
+  }
+
+  /* Looks like the prose links around it; reopens the consent banner. */
+  .inline-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    color: var(--color-text);
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.25em;
+    text-decoration-color: var(--color-text-faint);
+    transition: color 0.12s ease, text-decoration-color 0.12s ease;
+  }
+  .inline-btn:hover { color: var(--color-accent); text-decoration-color: var(--color-accent); }
+
+  @media (max-width: 640px) {
+    .privacy-wrap { padding-top: 2rem; }
+  }
+</style>

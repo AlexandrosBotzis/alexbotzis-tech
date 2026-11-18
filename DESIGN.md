@@ -313,6 +313,9 @@ In the cover's empty band on phones, a broadsheet jump line marks where the stor
 ### Back to top
 `BackToTop.astro`, on every page via `Base`: a 44px press-mark tile (zero radius, 1px ink border, paper fill) with an up-arrow drawn in the AB logo's geometry (1.6 stroke, butt caps, miter joins). Fixed bottom-right (16px gutter on phones, 24px on desktop, safe-area aware). Appears after 0.9 screens of scrolling; hidden and out of the tab order near the top, so short pages never show it. At the page end it docks on the footer's 2px rule instead of covering footer links. Hover inverts the tile to ink; focus shows the red ring. Click scrolls to top (instant under reduced motion) and moves focus to `main`. No circles, shadows or floating-action-button styling.
 
+### Consent banner
+`ConsentBanner.astro`, via `Base`, only when a GA ID is configured. A fixed bottom bar on paper under a 2px press rule (z 85: over back-to-top, under menu and header). Muted small text at reading measure; Allow and Decline are equal-weight mono uppercase underlined text buttons (no filled primary, no nudging). Stacks on phones. The footer's "Cookies" button (beside the copyright, inheriting its faint mono style) reopens it.
+
 ### Page transitions
 Native cross-document view transitions (`@view-transition { navigation: auto }`), CSS only, no JS router. The masthead (`#site-header`) stays perfectly still; the page under it clears (0.13s, fade and lift 8px) and then the new page settles (0.3s, from 12px below, ease-out). Sequential, never a cross-fade. The one flourish: item titles share a `view-transition-name` (`post-<slug>`, `project-<slug>`) with the headline of the page they open, so the title glides into place. Per-page fade-ups are skipped after a transition (`.vt-nav`, set on `pagereveal`). Reduced motion turns transitions off entirely. Browsers without support (Firefox) navigate instantly. No curtains, wipes or colored overlays between pages.
 
